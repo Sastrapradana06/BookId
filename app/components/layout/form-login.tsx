@@ -8,10 +8,11 @@ import useHandleAlert from "hooks/useHandleAlert";
 export default function FormLogin({ actionData }: { actionData: any }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const { status, data, handleAlert } = useHandleAlert();
-
   useEffect(() => {
-    if (actionData?.success) {
-      handleAlert("success", actionData?.message);
+    if (!actionData) return;
+
+    if (actionData?.success == false) {
+      handleAlert("error", actionData?.message);
     }
   }, [actionData]);
 
