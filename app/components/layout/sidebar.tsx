@@ -1,5 +1,5 @@
-import { Link } from "@remix-run/react";
-import { LayoutDashboard } from "lucide-react";
+import { BookOpenText, LayoutDashboard, LogOut } from "lucide-react";
+import ListLink from "../ui/list-link";
 
 export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
   return (
@@ -8,19 +8,19 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
         isSidebarOpen ? "translate-x-0" : "translate-x-[-100%]"
       }`}
     >
-      <div className="w-[90%] h-[200px] m-auto">
+      <div className="w-[90%] h-max m-auto ">
         <div className="w-full h-[70px]  lg:h-[80px] flex items-center justify-center gap-2 ">
           <img src="/gitbook.svg" alt="icons" className="w-[50px]" />
           <p className="text-[1.3rem] font-semibold">BookID</p>
         </div>
-        <div className="w-full h-[200px] flex flex-col items-center gap-3  py-6">
-          <Link
-            to={"/"}
-            className="w-max flex items-center gap-2 lg:gap-4 font-semibold"
-          >
-            <LayoutDashboard />
-            <p>Dashboard</p>
-          </Link>
+        <div className="w-full h-max flex flex-col items-center gap-7  py-6">
+          <ListLink
+            link="/dashboard"
+            text="dashboard"
+            icon={<LayoutDashboard />}
+          />
+          <ListLink link="/books" text="books" icon={<BookOpenText />} />
+          <ListLink link="/logout" text="Log out" icon={<LogOut />} />
         </div>
       </div>
     </div>

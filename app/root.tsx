@@ -5,9 +5,17 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
   useRouteError,
 } from "@remix-run/react";
 import "./tailwind.css";
+import { json, LoaderFunction } from "@remix-run/node";
+import { getUser } from "./services/auth.server";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await getUser(request);
+  return json({ user });
+};
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +36,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const { user } = useLoaderData<{
+    user: { id: string; name: string; role: string };
+  }>();
+  return <Outlet context={{ user }} />;
 }
 
 export function ErrorBoundary() {

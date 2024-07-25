@@ -4,6 +4,9 @@ import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import Alert from "../ui/alert";
 import useHandleAlert from "hooks/useHandleAlert";
+import Input from "../ui/input";
+import Label from "../ui/label";
+import Button from "../ui/button";
 
 export default function FormLogin({ actionData }: { actionData: any }) {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -30,14 +33,13 @@ export default function FormLogin({ actionData }: { actionData: any }) {
           </p>
         </div>
         <div className="w-full h-max lg:w-[90%]">
-          <label htmlFor="email">
-            <span className="text-red-500 mr-1">*</span>Email
-          </label>
-          <input
-            className="w-full h-[40px] rounded-lg bg-transparent border border-gray-300 mt-2 px-2 text-[.9rem]"
-            type="text"
+          <Label htmlFor="email" teks="Email" />
+          <Input
+            size="sm"
+            color="transparent"
+            type="email"
             name="email"
-            placeholder="Masukkan email anda"
+            plaseholder="Masukkan email anda"
           />
           {actionData?.errors?.email ? (
             <p className="text-red-500 ml-1 text-[.8rem]">
@@ -46,14 +48,13 @@ export default function FormLogin({ actionData }: { actionData: any }) {
           ) : null}
         </div>
         <div className="w-full h-[110px]  relative lg:w-[90%] ">
-          <label htmlFor="password">
-            <span className="text-red-500 mr-1">*</span>Password
-          </label>
-          <input
-            className="w-full h-[40px] rounded-lg bg-transparent border border-gray-300 mt-2 px-2 text-[.9rem]"
+          <Label htmlFor="password" teks="Password" />
+          <Input
+            size="sm"
+            color="transparent"
             type={isPasswordVisible ? "text" : "password"}
             name="password"
-            placeholder="Masukkan password anda"
+            plaseholder="Masukkan password anda"
           />
           {actionData?.errors?.password ? (
             <p className="text-red-500 ml-1 text-[.8rem]">
@@ -69,13 +70,13 @@ export default function FormLogin({ actionData }: { actionData: any }) {
           </button>
         </div>
         <div className="w-full h-max lg:w-[90%] -mt-6">
-          <button
-            className="w-full h-[40px] rounded-lg bg-indigo-500 text-white"
+          <Button
             type="submit"
             name="button"
-          >
-            Masuk
-          </button>
+            text="Masuk"
+            color="indigo"
+            size="w-full h-[40px] rounded-lg"
+          />
         </div>
       </Form>
     </>

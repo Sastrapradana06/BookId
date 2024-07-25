@@ -8,7 +8,6 @@ interface User {
   name: string;
 }
 
-// Buat instance Authenticator
 const authenticator = new Authenticator<User>(sessionStorage);
 
 authenticator.use(
@@ -17,10 +16,15 @@ authenticator.use(
     const password = form.get("password");
 
     if (email === "admin@gmail.com" && password === "123456") {
-      return { id: "1", name: "Admin" };
+      return { id: "1", name: "Gakiong Khun", role: "super admin" };
     }
     throw new Error("Invalid credentials");
   })
 );
 
-export { authenticator };
+async function getUser(request: Request) {
+  const user = await authenticator.isAuthenticated(request);
+  return user;
+}
+
+export { authenticator, getUser };

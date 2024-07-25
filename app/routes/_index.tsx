@@ -1,13 +1,9 @@
-import type {
-  ActionFunction,
-  ActionFunctionArgs,
-  MetaFunction,
-} from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import Logo from "~/components/ui/logo";
 import { json, redirect, useActionData } from "@remix-run/react";
-import FormLogin from "~/components/layout/form-login";
 import { authenticator } from "~/services/auth.server";
 import { commitSession, getSession } from "~/services/session.server";
+import FormLogin from "~/components/template/form-login";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,38 +12,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-// export async function action({ request }: ActionFunctionArgs) {
-//   const formData = await request.formData();
-//   const email = String(formData.get("email"));
-//   const password = String(formData.get("password"));
-
-//   const errors: Record<string, string> = {};
-
-//   console.log({ email, password });
-
-//   if (!email.includes("@")) {
-//     errors.email = "Email tidak valid";
-//   }
-
-//   if (password.length < 6) {
-//     errors.password = "Password min 6 karakter";
-//   }
-
-//   if (Object.keys(errors).length > 0) {
-//     return json({ errors });
-//   }
-
-//   return json({
-//     success: true,
-//     message: "Login success",
-//   });
-// }
-
 export const action = async ({ request }: ActionFunctionArgs) => {
-  // const formData = await request.formData();
-  // const email = formData.get("email");
-  // const password = formData.get("password");
-
   try {
     const user = await authenticator.authenticate("form", request);
     const session = await getSession(request.headers.get("Cookie"));
