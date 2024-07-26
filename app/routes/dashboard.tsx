@@ -1,6 +1,8 @@
 import { LoaderFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { BookOpenText, BookUp, Layers3, Users } from "lucide-react";
+import CardNew from "~/components/layout/card- new";
+import CardInfo from "~/components/layout/card-info";
 import Container from "~/components/layout/container";
 import { authenticator } from "~/services/auth.server";
 
@@ -36,51 +38,61 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="mt-6">
-          <p className="text-gray-500 text-[.9rem]">Overview</p>
+          <p className="text-gray-500 text-[.9rem] font-semibold ">Overview</p>
           <div className="w-full flex flex-wrap gap-3 items-center  mt-3  justify-between lg:gap-0">
-            <div className="w-[48%] h-[100px] bg-green-500 rounded-lg lg:w-[23%] flex items-center justify-center gap-3 lg:h-[80px] shadow-md">
-              <div className="p-2 rounded-xl bg-[#ffffff38]">
-                <Layers3 color="white" />
-              </div>
-              <div className="text-white">
-                <h1 className="text-white lg:text-[1.1rem]">202</h1>
-                <p className="text-white text-[.7rem] lg:text-[.8rem]">
-                  Jumlah Buku
-                </p>
-              </div>
-            </div>
-            <div className="w-[48%] h-[100px] bg-amber-400 rounded-lg lg:w-[23%] flex items-center justify-center gap-3 lg:h-[80px] shadow-md">
-              <div className="p-2 rounded-xl bg-[#ffffff38]">
-                <BookOpenText color="white" />
-              </div>
-              <div className="text-white">
-                <h1 className="text-white lg:text-[1.1rem]">120</h1>
-                <p className="text-white text-[.7rem] lg:text-[.8rem]">
-                  Jenis buku
-                </p>
-              </div>
-            </div>
-            <div className="w-[48%] h-[100px] bg-pink-600 rounded-lg lg:w-[23%] flex items-center justify-center gap-3 lg:h-[80px] shadow-md">
-              <div className="p-2 rounded-xl bg-[#ffffff38]">
-                <BookUp color="white" />
-              </div>
-              <div className="text-white">
-                <h1 className="text-white lg:text-[1.1rem]">48</h1>
-                <p className="text-white text-[.7rem] lg:text-[.8rem]">
-                  Terpinjam
-                </p>
-              </div>
-            </div>
-            <div className="w-[48%] h-[100px] bg-sky-600 rounded-lg lg:w-[23%] flex items-center justify-center gap-3 lg:h-[80px] shadow-md">
-              <div className="p-2 rounded-xl bg-[#ffffff38]">
-                <Users color="white" />
-              </div>
-              <div className="text-white">
-                <h1 className="text-white lg:text-[1.1rem]">5</h1>
-                <p className="text-white text-[.7rem] lg:text-[.8rem]">
-                  Anggota
-                </p>
-              </div>
+            <CardInfo
+              icons={<BookOpenText color="white" />}
+              total={150}
+              text="Jumlah buku"
+              bgColor="bg-green-500"
+            />
+            <CardInfo
+              icons={<Layers3 color="white" />}
+              total={60}
+              text="Jenis buku"
+              bgColor="bg-amber-400"
+            />
+            <CardInfo
+              icons={<BookUp color="white" />}
+              total={92}
+              text="Buku Dipinjam"
+              bgColor="bg-pink-600"
+            />
+            <CardInfo
+              icons={<Users color="white" />}
+              total={6}
+              text="Anggota"
+              bgColor="bg-sky-600"
+            />
+          </div>
+        </div>
+        <div className="mt-6 ">
+          <p className="text-gray-500 text-[.9rem] font-semibold capitalize">
+            latest books
+          </p>
+          <div className="w-full h-max  overflow-x-scroll flex gap-4">
+            <div className="min-w-max flex gap-4">
+              <CardNew
+                cover="/Laskar Pelangi.jpeg"
+                title="Laskar Pelangi"
+                author="Andrea Hirata"
+                date="23 agustus 2020"
+                halaman={12}
+              />
+              <CardNew
+                cover="/Read of the Day!.jpeg"
+                title="Read of the Day!"
+                author="OverDrive"
+                date="2 Maret 2007"
+                halaman={10}
+              />
+              <CardNew
+                cover="/Negeri 5 Menara.jpeg"
+                title="Negeri 5 Menara"
+                author="Ahmad Fuadi"
+                date="10 Januari 2022"
+                halaman={23}
+              />
             </div>
           </div>
         </div>
