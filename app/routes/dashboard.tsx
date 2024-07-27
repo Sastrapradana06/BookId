@@ -3,6 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { BookOpenText, BookUp, Layers3, Users } from "lucide-react";
 import CardNew from "~/components/layout/card- new";
 import CardInfo from "~/components/layout/card-info";
+import CardPopular from "~/components/layout/card-popular";
 import Container from "~/components/layout/container";
 import { authenticator } from "~/services/auth.server";
 
@@ -16,6 +17,72 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Dashboard() {
   const user: { id: string; name: string; role: string } = useLoaderData();
+
+  const latestBooks = [
+    {
+      id: 1,
+      cover: "/Laskar Pelangi.jpeg",
+      title: "Laskar Pelangi",
+      author: "Andrea Hirata",
+      release: "23 agustus 2020",
+      page: 12,
+    },
+    {
+      id: 2,
+      cover: "/Read of the Day!.jpeg",
+      title: "Pride and Prejudice",
+      author: "Jane Austen",
+      release: "2 Maret 2007",
+      page: 10,
+    },
+    {
+      id: 3,
+      cover: "/Negeri 5 Menara.jpeg",
+      title: "Negeri 5 Menara",
+      author: "Ahmad Fuadi",
+      release: "10 Januari 2022",
+      page: 23,
+    },
+  ];
+
+  const popularBooks = [
+    {
+      id: 1,
+      cover: "/Atomic Habits.jpeg",
+      title: "Atomic Habits",
+      author: "Andrea Hirata",
+      release: "5 april 2018",
+      page: 123,
+      dipinjam: 150,
+    },
+    {
+      id: 2,
+      cover: "/Ayat-Ayat Cinta.jpeg",
+      title: "Ayat-Ayat Cinta",
+      author: "Habiburrahman El Shirazy",
+      release: "2004",
+      page: 95,
+      dipinjam: 125,
+    },
+    {
+      id: 3,
+      cover: "/Sang Pemimpi.jpeg",
+      title: "Sang Pemimpi",
+      author: "Andrea Hirata",
+      release: "2006",
+      page: 76,
+      dipinjam: 97,
+    },
+    {
+      id: 4,
+      cover: "/To Kill a Mockingbird.jpeg",
+      title: "To Kill a Mockingbird",
+      author: "Harper Lee",
+      release: "1960",
+      page: 51,
+      dipinjam: 73,
+    },
+  ];
 
   return (
     <Container>
@@ -67,32 +134,37 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="mt-6 ">
-          <p className="text-gray-500 text-[.9rem] font-semibold capitalize">
+          <p className="text-gray-500 text-[.9rem] font-semibold capitalize ">
             latest books
           </p>
           <div className="w-full h-max  overflow-x-scroll flex gap-4">
             <div className="min-w-max flex gap-4">
-              <CardNew
-                cover="/Laskar Pelangi.jpeg"
-                title="Laskar Pelangi"
-                author="Andrea Hirata"
-                date="23 agustus 2020"
-                halaman={12}
-              />
-              <CardNew
-                cover="/Read of the Day!.jpeg"
-                title="Read of the Day!"
-                author="OverDrive"
-                date="2 Maret 2007"
-                halaman={10}
-              />
-              <CardNew
-                cover="/Negeri 5 Menara.jpeg"
-                title="Negeri 5 Menara"
-                author="Ahmad Fuadi"
-                date="10 Januari 2022"
-                halaman={23}
-              />
+              {latestBooks.map((book) => (
+                <CardNew
+                  key={book.id}
+                  cover={book.cover}
+                  title={book.title}
+                  author={book.author}
+                  date={book.release}
+                  halaman={book.page}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 ">
+          <p className="text-gray-500 text-[.9rem] font-semibold capitalize ">
+            most popular books
+          </p>
+          <div className="w-full h-max  overflow-x-scroll flex gap-4">
+            <div className="min-w-max flex gap-4 lg:gap-6">
+              {popularBooks.map((book) => (
+                <CardPopular
+                  key={book.id}
+                  cover={book.cover}
+                  terpinjam={book.dipinjam}
+                />
+              ))}
             </div>
           </div>
         </div>
