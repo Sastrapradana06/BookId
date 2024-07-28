@@ -1,24 +1,28 @@
-import { Link, useLocation, useOutletContext } from "@remix-run/react";
+import { MetaFunction } from "@remix-run/node";
+import { Link, useLocation } from "@remix-run/react";
 import {
   BookOpenText,
   ChevronRight,
   PencilLine,
+  ScanEye,
   Search,
   Trash2,
 } from "lucide-react";
 import Container from "~/components/layout/container";
-import { UserContext } from "~/utils/type";
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Data Books" },
+    { name: "Data Books", content: "Welcome to Data books" },
+  ];
+};
 
 export default function Books() {
-  const { user } = useOutletContext<UserContext>();
-  console.log({ user }, "user");
-
   const { pathname } = useLocation();
-
-  console.log({ pathname });
 
   const books = [
     {
+      id: 1,
       judul: "The Great Gatsby",
       author: "F. Scott Fitzgerald",
       genre: "Fiction",
@@ -26,11 +30,13 @@ export default function Books() {
       pages: 180,
       status: "tersedia",
       tahunTerbit: 1925,
-      tahunPengadaan: 2020,
+      tahunPengadaan: "12 Februari 2024",
       stok: 10,
       terpinjam: 2,
+      pengembalian: 4,
     },
     {
+      id: 2,
       judul: "To Kill a Mockingbird",
       author: "Harper Lee",
       genre: "Fiction",
@@ -38,11 +44,13 @@ export default function Books() {
       pages: 281,
       status: "tersedia",
       tahunTerbit: 1960,
-      tahunPengadaan: 2018,
+      tahunPengadaan: "12 Februari 2024",
       stok: 7,
       terpinjam: 1,
+      pengembalian: 4,
     },
     {
+      id: 3,
       judul: "1984",
       author: "George Orwell",
       genre: "Dystopian",
@@ -50,11 +58,13 @@ export default function Books() {
       pages: 328,
       status: "tersedia",
       tahunTerbit: 1949,
-      tahunPengadaan: 2019,
+      tahunPengadaan: "12 Februari 2024",
       stok: 5,
       terpinjam: 3,
+      pengembalian: 4,
     },
     {
+      id: 4,
       judul: "Pride and Prejudice",
       author: "Jane Austen",
       genre: "Romance",
@@ -62,11 +72,13 @@ export default function Books() {
       pages: 279,
       status: "tersedia",
       tahunTerbit: 1813,
-      tahunPengadaan: 2021,
+      tahunPengadaan: "12 Februari 2024",
       stok: 8,
       terpinjam: 2,
+      pengembalian: 4,
     },
     {
+      id: 5,
       judul: "The Catcher in the Rye",
       author: "J.D. Salinger",
       genre: "Fiction",
@@ -74,69 +86,10 @@ export default function Books() {
       pages: 214,
       status: "tersedia",
       tahunTerbit: 1951,
-      tahunPengadaan: 2017,
+      tahunPengadaan: "12 Februari 2024",
       stok: 6,
       terpinjam: 1,
-    },
-    {
-      judul: "The Hobbit",
-      author: "J.R.R. Tolkien",
-      genre: "Fantasy",
-      language: "English",
-      pages: 310,
-      status: "tersedia",
-      tahunTerbit: 1937,
-      tahunPengadaan: 2016,
-      stok: 9,
-      terpinjam: 4,
-    },
-    {
-      judul: "Fahrenheit 451",
-      author: "Ray Bradbury",
-      genre: "Dystopian",
-      language: "English",
-      pages: 194,
-      status: "tersedia",
-      tahunTerbit: 1953,
-      tahunPengadaan: 2020,
-      stok: 8,
-      terpinjam: 3,
-    },
-    {
-      judul: "The Alchemist",
-      author: "Paulo Coelho",
-      genre: "Adventure",
-      language: "Portuguese",
-      pages: 163,
-      status: "tersedia",
-      tahunTerbit: 1988,
-      tahunPengadaan: 2019,
-      stok: 12,
-      terpinjam: 5,
-    },
-    {
-      judul: "One Hundred Years of Solitude",
-      author: "Gabriel Garcia Marquez",
-      genre: "Magic Realism",
-      language: "Spanish",
-      pages: 417,
-      status: "tersedia",
-      tahunTerbit: 1967,
-      tahunPengadaan: 2018,
-      stok: 4,
-      terpinjam: 2,
-    },
-    {
-      judul: "Moby Dick",
-      author: "Herman Melville",
-      genre: "Adventure",
-      language: "English",
-      pages: 635,
-      status: "tersedia",
-      tahunTerbit: 1851,
-      tahunPengadaan: 2021,
-      stok: 3,
-      terpinjam: 1,
+      pengembalian: 4,
     },
   ];
 
@@ -154,7 +107,7 @@ export default function Books() {
           </Link>
           <ChevronRight size={18} className="mt-[1px]" />
           <Link
-            to="/books/add"
+            to="add"
             className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
               pathname === "/books/add" ? "text-gray-500" : "text-gray-400"
             }`}
@@ -208,25 +161,19 @@ export default function Books() {
                   Judul Buku
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
-                  Author
+                  Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
-                  Genre
+                  Stok
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
-                  Language
+                  Terpinjam
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
-                  Pages
-                </th>
-                <th scope="col" className="px-6 py-3 text-white">
-                  Tahun Terbit
+                  Pengembalian
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
                   Tahun Pengadaan
-                </th>
-                <th scope="col" className="px-6 py-3 text-white">
-                  Status
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
                   Action
@@ -257,12 +204,6 @@ export default function Books() {
                   >
                     {book.judul}
                   </th>
-                  <td className="px-6 py-4">{book.author}</td>
-                  <td className="px-6 py-4">{book.genre}</td>
-                  <td className="px-6 py-4">{book.language}</td>
-                  <td className="px-6 py-4">{book.pages}</td>
-                  <td className="px-6 py-4">{book.tahunTerbit}</td>
-                  <td className="px-6 py-4">{book.tahunPengadaan}</td>
                   <td className="px-6 py-4">
                     <p
                       className={`capitalize font-semibold ${
@@ -274,14 +215,22 @@ export default function Books() {
                       {book.status}
                     </p>
                   </td>
+                  <td className="px-6 py-4">{book.stok}</td>
+                  <td className="px-6 py-4">{book.terpinjam}</td>
+                  <td className="px-6 py-4">{book.pengembalian}</td>
+                  <td className="px-6 py-4">{book.tahunPengadaan}</td>
+
                   <td className="">
                     <div className="flex items-center gap-3 justify-center">
+                      <Link to={`detail/${book.id}`}>
+                        <ScanEye size={20} color="green" />
+                      </Link>
                       <Link to={`/books/edit/`}>
                         <PencilLine size={20} color="purple" />
                       </Link>
-                      <Link to={`/books/edit/`}>
+                      <button>
                         <Trash2 size={20} color="crimson" />
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>

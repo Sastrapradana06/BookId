@@ -47,12 +47,14 @@ export function ErrorBoundary() {
 
   if (isRouteErrorResponse(error)) {
     return (
-      <>
-        <h1>
-          {error.status} {error.statusText}
-        </h1>
-        <p>{error.data}</p>
-      </>
+      <div className="w-ful h-[100vh] flex justify-center items-center">
+        <div className="">
+          <img src="/404.png" alt="img" className="w-[300px] lg:w-[400px] " />
+          <p className="text-center zain text-[1.5rem] lg:text-[1.8rem]">
+            Error. Page not found
+          </p>
+        </div>
+      </div>
     );
   }
 
