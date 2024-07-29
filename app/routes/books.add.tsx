@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  ActionFunction,
-  json,
-  MetaFunction,
-  unstable_createFileUploadHandler,
-  unstable_parseMultipartFormData,
-} from "@remix-run/node";
+import { ActionFunctionArgs, json, MetaFunction } from "@remix-run/node";
 import { Form, Link, useActionData, useLocation } from "@remix-run/react";
 import useHandleFile from "hooks/useHandleFile";
 import { CalendarDays, ChevronRight } from "lucide-react";
@@ -13,7 +7,7 @@ import { useRef } from "react";
 import Container from "~/components/layout/container";
 import Input from "~/components/ui/input";
 import Label from "~/components/ui/label";
-import { createUploadthing, type FileRouter } from "uploadthing/express";
+import supabase from "~/lib/supabase";
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,25 +16,34 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const action: ActionFunction = async ({ request }) => {
-  const uploadHandler = unstable_createFileUploadHandler({
-    directory: "./public/uploads",
-    file: ({ filename }) => filename,
-  });
+export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log(process.env.SUPABASE_KEY);
+  const formData = await request.formData();
+  const dataForm = {
+    judul_buku: formData.get("judul"),
+    penulis: formData.get("penulis"),
+    genre: formData.get("genre"),
+    bahasa: formData.get("bahasa"),
+    pages: formData.get("jumlah_halaman"),
+    tahun_terbit: formData.get("tahun_terbit"),
+    stok: parseInt(formData.get("stok") as string, 10),
+  };
 
-  const formData = await unstable_parseMultipartFormData(
-    request,
-    uploadHandler
-  );
-  const file: any = formData.get("cover");
+  try {
+    const { error } = await supabase.from("data buku").insert([dataForm]);
 
-  if (!file) {
-    return json({ error: "Tidak ada file yang diunggah" }, { status: 400 });
+    if (error) {
+      throw error;
+    }
+
+    return json({ success: true, dataForm });
+  } catch (error) {
+    console.error("Error inserting data into Supabase:", error);
+    return json({
+      success: false,
+      error: "Error inserting data into Supabase",
+    });
   }
-
-  const url = `/uploads/${file.name}`;
-
-  return json({ url });
 };
 
 export default function AddBooks() {
@@ -111,7 +114,7 @@ export default function AddBooks() {
               src={
                 urlImg
                   ? urlImg
-                  : "https://utfs.io/f/f93031bf-f35e-4740-ab79-14e0346eb790-1u7le.jpeg"
+                  : "https://ik.imagekit.io/ym7xz7t46/my.jpeg?updatedAt=1722262771247"
               }
               alt="cover"
               className="w-[150px] h-[200px] rounded-md object-cover mt-1"
@@ -206,7 +209,7 @@ export default function AddBooks() {
               </div>
             </div>
             <div className="w-full h-max flex flex-col justify-center gap-3 lg:flex-row borde-r">
-              <div className="w-full relative">
+              {/* <div className="w-full relative">
                 <Label htmlFor="Tanggal Pengadaan" teks="Tgl. Pengadaan" />
                 <input
                   type="date"
@@ -219,7 +222,7 @@ export default function AddBooks() {
                   color="black"
                   className="absolute top-10 left-3"
                 />
-              </div>
+              </div> */}
               <div className="w-full ">
                 <Label htmlFor="stok" teks="Jumlah Stok" />
                 <Input
