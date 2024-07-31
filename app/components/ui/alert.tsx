@@ -14,7 +14,7 @@ export default function Alert({
   return (
     <div className="w-full h-max flex justify-center items-center fixed top-0 left-0 z-[1000]">
       <div
-        className={`flex max-w-[90%] min-h-max lg:w-max items-center p-2 lg:p-4 mt-4 text-sm   border-2  rounded-lg bg-slate-100 shadow-sm  `}
+        className={`flex max-w-[90%] min-h-max lg:w-max items-center p-3 lg:p-4 mt-4 text-sm   border-2  rounded-xl bg-gray-700 shadow-sm gap-1 `}
         role="alert"
       >
         {type == "success" ? (
@@ -35,7 +35,7 @@ export default function Alert({
         <span className="sr-only">Info</span>
         <div>
           <p
-            className={`text-[.9rem] ${
+            className={`text-[.9rem] font-semibold ${
               type == "success"
                 ? "text-green-500"
                 : type == "info"

@@ -1,5 +1,5 @@
-import { MetaFunction } from "@remix-run/node";
-import { Link, useLocation } from "@remix-run/react";
+import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
+import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import {
   BookOpenText,
   ChevronRight,
@@ -9,6 +9,17 @@ import {
   Trash2,
 } from "lucide-react";
 import Container from "~/components/layout/container";
+import { getBooks } from "~/services/supabase/fetch.server";
+import { BookDB } from "~/utils/type";
+import { formatDate } from "~/utils/utils";
+
+type LoaderData = {
+  status: boolean;
+  data?: BookDB[];
+  error?: {
+    code: string;
+  };
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -17,81 +28,92 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async () => {
+  const dataBuku = await getBooks();
+  if (dataBuku.status === false) {
+    return json({ status: false, error: dataBuku.error });
+  }
+  console.log({ dataBuku });
+  return json({ status: true, data: dataBuku.data });
+};
+
 export default function Books() {
   const { pathname } = useLocation();
 
-  const books = [
-    {
-      id: 1,
-      judul: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      genre: "Fiction",
-      language: "English",
-      pages: 180,
-      status: "tersedia",
-      tahunTerbit: 1925,
-      tahunPengadaan: "12 Februari 2024",
-      stok: 10,
-      terpinjam: 2,
-      pengembalian: 4,
-    },
-    {
-      id: 2,
-      judul: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      genre: "Fiction",
-      language: "English",
-      pages: 281,
-      status: "tersedia",
-      tahunTerbit: 1960,
-      tahunPengadaan: "12 Februari 2024",
-      stok: 7,
-      terpinjam: 1,
-      pengembalian: 4,
-    },
-    {
-      id: 3,
-      judul: "1984",
-      author: "George Orwell",
-      genre: "Dystopian",
-      language: "English",
-      pages: 328,
-      status: "tersedia",
-      tahunTerbit: 1949,
-      tahunPengadaan: "12 Februari 2024",
-      stok: 5,
-      terpinjam: 3,
-      pengembalian: 4,
-    },
-    {
-      id: 4,
-      judul: "Pride and Prejudice",
-      author: "Jane Austen",
-      genre: "Romance",
-      language: "English",
-      pages: 279,
-      status: "tersedia",
-      tahunTerbit: 1813,
-      tahunPengadaan: "12 Februari 2024",
-      stok: 8,
-      terpinjam: 2,
-      pengembalian: 4,
-    },
-    {
-      id: 5,
-      judul: "The Catcher in the Rye",
-      author: "J.D. Salinger",
-      genre: "Fiction",
-      language: "English",
-      pages: 214,
-      status: "tersedia",
-      tahunTerbit: 1951,
-      tahunPengadaan: "12 Februari 2024",
-      stok: 6,
-      terpinjam: 1,
-      pengembalian: 4,
-    },
-  ];
+  const { data } = useLoaderData<LoaderData>();
+
+  // const books = [
+  //   {
+  //     id: 1,
+  //     judul: "The Great Gatsby",
+  //     author: "F. Scott Fitzgerald",
+  //     genre: "Fiction",
+  //     language: "English",
+  //     pages: 180,
+  //     status: "tersedia",
+  //     tahunTerbit: 1925,
+  //     tahunPengadaan: "12 Februari 2024",
+  //     stok: 10,
+  //     terpinjam: 2,
+  //     pengembalian: 4,
+  //   },
+  //   {
+  //     id: 2,
+  //     judul: "To Kill a Mockingbird",
+  //     author: "Harper Lee",
+  //     genre: "Fiction",
+  //     language: "English",
+  //     pages: 281,
+  //     status: "tersedia",
+  //     tahunTerbit: 1960,
+  //     tahunPengadaan: "12 Februari 2024",
+  //     stok: 7,
+  //     terpinjam: 1,
+  //     pengembalian: 4,
+  //   },
+  //   {
+  //     id: 3,
+  //     judul: "1984",
+  //     author: "George Orwell",
+  //     genre: "Dystopian",
+  //     language: "English",
+  //     pages: 328,
+  //     status: "tersedia",
+  //     tahunTerbit: 1949,
+  //     tahunPengadaan: "12 Februari 2024",
+  //     stok: 5,
+  //     terpinjam: 3,
+  //     pengembalian: 4,
+  //   },
+  //   {
+  //     id: 4,
+  //     judul: "Pride and Prejudice",
+  //     author: "Jane Austen",
+  //     genre: "Romance",
+  //     language: "English",
+  //     pages: 279,
+  //     status: "tersedia",
+  //     tahunTerbit: 1813,
+  //     tahunPengadaan: "12 Februari 2024",
+  //     stok: 8,
+  //     terpinjam: 2,
+  //     pengembalian: 4,
+  //   },
+  //   {
+  //     id: 5,
+  //     judul: "The Catcher in the Rye",
+  //     author: "J.D. Salinger",
+  //     genre: "Fiction",
+  //     language: "English",
+  //     pages: 214,
+  //     status: "tersedia",
+  //     tahunTerbit: 1951,
+  //     tahunPengadaan: "12 Februari 2024",
+  //     stok: 6,
+  //     terpinjam: 1,
+  //     pengembalian: 4,
+  //   },
+  // ];
 
   return (
     <Container>
@@ -161,7 +183,10 @@ export default function Books() {
                   Judul Buku
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
-                  Status
+                  Cover
+                </th>
+                <th scope="col" className="px-6 py-3 text-white">
+                  Tersedia
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
                   Stok
@@ -181,7 +206,7 @@ export default function Books() {
               </tr>
             </thead>
             <tbody>
-              {books.map((book, i) => (
+              {data?.map((book, i) => (
                 <tr className="bg-transparent border-b border-gray-400" key={i}>
                   <td className="w-4 p-4">
                     <div className="flex items-center">
@@ -200,25 +225,33 @@ export default function Books() {
                   </td>
                   <th
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap capitalize"
                   >
-                    {book.judul}
+                    {book.judul_buku}
                   </th>
+                  <th scope="row" className="px-6 py-4 ">
+                    <img
+                      src={book.cover}
+                      alt="book_cover"
+                      className="w-[50px] h-[50px] object-cover"
+                    />
+                  </th>
+
                   <td className="px-6 py-4">
-                    <p
-                      className={`capitalize font-semibold ${
-                        book.status == "tersedia"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {book.status}
-                    </p>
+                    {book.stok - (book.terpinjam + book.pengembalian) > 0 ? (
+                      <p className="capitalize font-semibold text-green-500">
+                        {book.stok - (book.terpinjam + book.pengembalian)}
+                      </p>
+                    ) : (
+                      <p className="capitalize font-semibold text-red-500">
+                        0{" "}
+                      </p>
+                    )}
                   </td>
                   <td className="px-6 py-4">{book.stok}</td>
                   <td className="px-6 py-4">{book.terpinjam}</td>
                   <td className="px-6 py-4">{book.pengembalian}</td>
-                  <td className="px-6 py-4">{book.tahunPengadaan}</td>
+                  <td className="px-6 py-4">{formatDate(book.created_at)}</td>
 
                   <td className="">
                     <div className="flex items-center gap-3 justify-center">

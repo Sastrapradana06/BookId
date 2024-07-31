@@ -12,5 +12,10 @@ export default function useHandleFile() {
     }
   };
 
-  return { file, urlImg, handleFile };
+  const reset = () => {
+    setFile(null);
+    setUrlImg("");
+  };
+
+  return { file, urlImg, handleFile, reset };
 }
