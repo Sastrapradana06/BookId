@@ -17,3 +17,20 @@ export async function getBooks() {
     return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
   }
 }
+
+export async function getBooksId(id: number) {
+  try {
+    const { data, error } = await supabase
+      .from("data buku")
+      .select()
+      .eq("id", id);
+
+    if (error) {
+      throw error;
+    }
+
+    return { status: true, data };
+  } catch (error: any) {
+    return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
+  }
+}

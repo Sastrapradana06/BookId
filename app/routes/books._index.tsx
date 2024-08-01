@@ -1,5 +1,12 @@
-import { json, LoaderFunction, MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData, useLocation } from "@remix-run/react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
+import useHandleAlert from "hooks/useHandleAlert";
 import {
   BookOpenText,
   ChevronRight,
@@ -8,7 +15,11 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
+import ModalDelete from "~/components/layout/modal-delete";
+import Alert from "~/components/ui/alert";
+import { deleteBook } from "~/services/supabase/delete.server";
 import { getBooks } from "~/services/supabase/fetch.server";
 import { BookDB } from "~/utils/type";
 import { formatDate } from "~/utils/utils";
@@ -28,95 +39,68 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const id = Number(formData.get("idDelete"));
+
+  const result = await deleteBook(id);
+  return json({ success: result.status });
+};
+
 export const loader: LoaderFunction = async () => {
   const dataBuku = await getBooks();
   if (dataBuku.status === false) {
     return json({ status: false, error: dataBuku.error });
   }
-  console.log({ dataBuku });
   return json({ status: true, data: dataBuku.data });
 };
 
 export default function Books() {
-  const { pathname } = useLocation();
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [idDelete, setIdDelete] = useState<number>(0);
+  const { status, data: dataAlert, handleAlert } = useHandleAlert();
 
+  const { pathname } = useLocation();
+  const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
 
-  // const books = [
-  //   {
-  //     id: 1,
-  //     judul: "The Great Gatsby",
-  //     author: "F. Scott Fitzgerald",
-  //     genre: "Fiction",
-  //     language: "English",
-  //     pages: 180,
-  //     status: "tersedia",
-  //     tahunTerbit: 1925,
-  //     tahunPengadaan: "12 Februari 2024",
-  //     stok: 10,
-  //     terpinjam: 2,
-  //     pengembalian: 4,
-  //   },
-  //   {
-  //     id: 2,
-  //     judul: "To Kill a Mockingbird",
-  //     author: "Harper Lee",
-  //     genre: "Fiction",
-  //     language: "English",
-  //     pages: 281,
-  //     status: "tersedia",
-  //     tahunTerbit: 1960,
-  //     tahunPengadaan: "12 Februari 2024",
-  //     stok: 7,
-  //     terpinjam: 1,
-  //     pengembalian: 4,
-  //   },
-  //   {
-  //     id: 3,
-  //     judul: "1984",
-  //     author: "George Orwell",
-  //     genre: "Dystopian",
-  //     language: "English",
-  //     pages: 328,
-  //     status: "tersedia",
-  //     tahunTerbit: 1949,
-  //     tahunPengadaan: "12 Februari 2024",
-  //     stok: 5,
-  //     terpinjam: 3,
-  //     pengembalian: 4,
-  //   },
-  //   {
-  //     id: 4,
-  //     judul: "Pride and Prejudice",
-  //     author: "Jane Austen",
-  //     genre: "Romance",
-  //     language: "English",
-  //     pages: 279,
-  //     status: "tersedia",
-  //     tahunTerbit: 1813,
-  //     tahunPengadaan: "12 Februari 2024",
-  //     stok: 8,
-  //     terpinjam: 2,
-  //     pengembalian: 4,
-  //   },
-  //   {
-  //     id: 5,
-  //     judul: "The Catcher in the Rye",
-  //     author: "J.D. Salinger",
-  //     genre: "Fiction",
-  //     language: "English",
-  //     pages: 214,
-  //     status: "tersedia",
-  //     tahunTerbit: 1951,
-  //     tahunPengadaan: "12 Februari 2024",
-  //     stok: 6,
-  //     terpinjam: 1,
-  //     pengembalian: 4,
-  //   },
-  // ];
+  const deleteBuku = async () => {
+    fetcher.submit({ idDelete }, { method: "post" });
+  };
+
+  const showDeleteModal = (id: number) => {
+    setIsDeleteModal(true);
+    setIdDelete(id);
+  };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data.success) {
+        handleAlert("success", "Berhasil menghapus buku");
+        setIsDeleteModal(false);
+        setIdDelete(0);
+      } else {
+        setIsDeleteModal(false);
+        handleAlert("error", "Gagal menghapus buku");
+      }
+    }
+  }, [fetcher.data, fetcher.state]);
 
   return (
     <Container>
+      <>
+        <ModalDelete
+          type="buku"
+          isModalOpen={isDeleteModal}
+          setIsModalOpen={setIsDeleteModal}
+          funcDelete={deleteBuku}
+        />
+        <Alert
+          status={status}
+          type={dataAlert?.type}
+          message={dataAlert?.message}
+        />
+      </>
       <section className="mt-1 lg:mt-0">
         <div className="w-max flex items-center gap-1">
           <Link
@@ -261,7 +245,11 @@ export default function Books() {
                       <Link to={`/books/edit/`}>
                         <PencilLine size={20} color="purple" />
                       </Link>
-                      <button>
+                      <button
+                        name="button"
+                        title="Delete"
+                        onClick={() => showDeleteModal(book.id)}
+                      >
                         <Trash2 size={20} color="crimson" />
                       </button>
                     </div>
