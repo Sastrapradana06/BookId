@@ -4,6 +4,7 @@ import {
   json,
   LoaderFunction,
   MetaFunction,
+  redirect,
 } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
@@ -19,6 +20,7 @@ import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
 import Alert from "~/components/ui/alert";
+import { isAuthUser } from "~/services/auth.server";
 import { deleteBook } from "~/services/supabase/delete.server";
 import { getBooks } from "~/services/supabase/fetch.server";
 import { BookDB } from "~/utils/type";
@@ -47,7 +49,11 @@ export const action: ActionFunction = async ({ request }) => {
   return json({ success: result.status });
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await isAuthUser(request);
+  if (!user) {
+    return redirect("/");
+  }
   const dataBuku = await getBooks();
   if (dataBuku.status === false) {
     return json({ status: false, error: dataBuku.error });
@@ -63,6 +69,8 @@ export default function Books() {
   const { pathname } = useLocation();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
+  const loader = useLoaderData();
+  console.log({ loader });
 
   const deleteBuku = async () => {
     fetcher.submit({ idDelete }, { method: "post" });

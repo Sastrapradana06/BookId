@@ -1,22 +1,24 @@
-import { LoaderFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useOutletContext } from "@remix-run/react";
 import { BookOpenText, BookUp, Layers3, Users } from "lucide-react";
 import CardNew from "~/components/layout/card- new";
 import CardInfo from "~/components/layout/card-info";
 import CardPopular from "~/components/layout/card-popular";
 import Container from "~/components/layout/container";
-import { authenticator } from "~/services/auth.server";
+import { UserContext } from "~/utils/type";
+import { json, LoaderFunction, redirect } from "@remix-run/node";
+import { isAuthUser } from "~/services/auth.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/",
-  });
+  const user = await isAuthUser(request);
+  if (!user) {
+    return redirect("/");
+  }
 
-  return user;
+  return json({ user });
 };
 
 export default function Dashboard() {
-  const user: { id: string; name: string; role: string } = useLoaderData();
+  const { user } = useOutletContext<UserContext>();
 
   const latestBooks = [
     {

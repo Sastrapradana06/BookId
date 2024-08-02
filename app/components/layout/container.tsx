@@ -1,6 +1,5 @@
 import Navbar from "./navbar";
 
-/* eslint-disable react/prop-types */
 export default function Container({ children }: { children: React.ReactNode }) {
   return (
     <main className="w-full h-max max-h-max">

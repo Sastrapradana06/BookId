@@ -27,4 +27,12 @@ async function getUser(request: Request) {
   return user;
 }
 
-export { authenticator, getUser };
+const isAuthUser = async (request: Request) => {
+  const user = await authenticator.isAuthenticated(request);
+  if (!user) {
+    return false;
+  }
+  return true;
+};
+
+export { authenticator, getUser, isAuthUser };

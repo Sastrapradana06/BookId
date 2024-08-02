@@ -16,6 +16,10 @@ body {
   @apply border border-red-500;
 }
 
+.border-s {
+  @apply border border-sky-500;
+}
+
 .zain {
   font-family: "Zain", sans-serif;
 }
