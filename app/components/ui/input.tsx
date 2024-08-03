@@ -3,7 +3,9 @@ interface InputProps {
   color: "transparent" | "white";
   type: "text" | "password" | "email";
   name: string;
-  plaseholder?: string;
+  value?: string | number;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
 }
 
 export default function Input({
@@ -11,14 +13,18 @@ export default function Input({
   color,
   type,
   name,
-  plaseholder,
+  value,
+  onChange,
+  placeholder,
 }: InputProps) {
   return (
     <input
       className={`w-full rounded-lg  mt-2 ${sizeInput[size]} ${colorInput[color]}`}
       type={type}
       name={name}
-      placeholder={plaseholder}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
       required
     />
   );

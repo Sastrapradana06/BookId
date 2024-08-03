@@ -28,3 +28,14 @@ export const uploadImg = async (file: File) => {
   }
   return data.publicUrl;
 };
+
+export const deleteImg = async (fileName: string) => {
+  const { error } = await supabase.storage
+    .from("cover_book")
+    .remove([`${fileName}`]);
+  if (error) {
+    console.log(error);
+    return null;
+  }
+  return true;
+};

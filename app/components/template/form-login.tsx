@@ -39,7 +39,7 @@ export default function FormLogin({ actionData }: { actionData: any }) {
             color="transparent"
             type="email"
             name="email"
-            plaseholder="Masukkan email anda"
+            placeholder="Masukkan email anda"
           />
           {actionData?.errors?.email ? (
             <p className="text-red-500 ml-1 text-[.8rem]">
@@ -54,7 +54,7 @@ export default function FormLogin({ actionData }: { actionData: any }) {
             color="transparent"
             type={isPasswordVisible ? "text" : "password"}
             name="password"
-            plaseholder="Masukkan password anda"
+            placeholder="Masukkan password anda"
           />
           {actionData?.errors?.password ? (
             <p className="text-red-500 ml-1 text-[.8rem]">

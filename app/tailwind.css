@@ -9,7 +9,7 @@ body {
 }
 
 .modal {
-  @apply w-full h-[100vh] bg-[#00000054] fixed top-0 left-0 z-50 flex justify-center items-center;
+  @apply w-full min-h-[100vh] max-h-max pb-10 bg-[#00000031] fixed top-0 left-0 z-50 flex justify-center items-center;
 }
 
 .border-r {

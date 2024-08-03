@@ -11,7 +11,7 @@ import Input from "~/components/ui/input";
 import Label from "~/components/ui/label";
 import Loading from "~/components/ui/loading";
 import { insertBook } from "~/services/supabase/insert.server";
-import { uploadImg } from "~/services/supabase/upload.server";
+import { uploadImg } from "~/services/supabase/storage.server";
 
 type InsertDataBuku = {
   status: boolean;
@@ -196,7 +196,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="judul"
-                  plaseholder="Masukkan Judul Buku"
+                  placeholder="Masukkan Judul Buku"
                 />
               </div>
               <div className="w-full">
@@ -206,7 +206,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="penulis"
-                  plaseholder="Penulis buku"
+                  placeholder="Penulis buku"
                 />
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="genre"
-                  plaseholder="Genre buku"
+                  placeholder="Genre buku"
                 />
               </div>
               <div className="w-full ">
@@ -244,7 +244,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="tahun_terbit"
-                  plaseholder="Tahun Terbit"
+                  placeholder="Tahun Terbit"
                 />
               </div>
               <div className="w-full ">
@@ -254,7 +254,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="jumlah_halaman"
-                  plaseholder="Jumlah Halaman"
+                  placeholder="Jumlah Halaman"
                 />
               </div>
             </div>
@@ -266,7 +266,7 @@ export default function AddBooks() {
                   color="transparent"
                   type="text"
                   name="stok"
-                  plaseholder="Stok Buku"
+                  placeholder="Stok Buku"
                 />
               </div>
             </div>

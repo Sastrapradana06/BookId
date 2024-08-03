@@ -1,7 +1,7 @@
 export type UserContext = { user: { id: string; name: string; role: string } };
 export type BookDB = {
   id: number;
-  created_at: Date;
+  created_at: Date | string;
   judul_buku: string;
   penulis: string;
   genre: string;

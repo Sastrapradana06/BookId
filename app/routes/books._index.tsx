@@ -11,7 +11,6 @@ import useHandleAlert from "hooks/useHandleAlert";
 import {
   BookOpenText,
   ChevronRight,
-  PencilLine,
   ScanEye,
   Search,
   Trash2,
@@ -23,8 +22,9 @@ import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
 import { deleteBook } from "~/services/supabase/delete.server";
 import { getBooks } from "~/services/supabase/fetch.server";
+import { deleteImg } from "~/services/supabase/storage.server";
 import { BookDB } from "~/utils/type";
-import { formatDate } from "~/utils/utils";
+import { extractFilePath, formatDate } from "~/utils/utils";
 
 type LoaderData = {
   status: boolean;
@@ -44,7 +44,12 @@ export const meta: MetaFunction = () => {
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const id = Number(formData.get("idDelete"));
+  const urlCover = String(formData.get("book_cover"));
 
+  if (urlCover !== "/cover-black.jpeg") {
+    const url = extractFilePath(urlCover);
+    await deleteImg(url);
+  }
   const result = await deleteBook(id);
   return json({ success: result.status });
 };
@@ -63,22 +68,24 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Books() {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+
   const [idDelete, setIdDelete] = useState<number>(0);
+  const [urlCoverBook, setUrlCoverBook] = useState<string>("");
+
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
 
   const { pathname } = useLocation();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
-  const loader = useLoaderData();
-  console.log({ loader });
 
   const deleteBuku = async () => {
-    fetcher.submit({ idDelete }, { method: "post" });
+    fetcher.submit({ idDelete, book_cover: urlCoverBook }, { method: "post" });
   };
 
-  const showDeleteModal = (id: number) => {
+  const showDeleteModal = (id: number, urlCover: string) => {
     setIsDeleteModal(true);
     setIdDelete(id);
+    setUrlCoverBook(urlCover);
   };
 
   useEffect(() => {
@@ -250,13 +257,10 @@ export default function Books() {
                       <Link to={`detail/${book.id}`}>
                         <ScanEye size={20} color="green" />
                       </Link>
-                      <Link to={`/books/edit/`}>
-                        <PencilLine size={20} color="purple" />
-                      </Link>
                       <button
                         name="button"
                         title="Delete"
-                        onClick={() => showDeleteModal(book.id)}
+                        onClick={() => showDeleteModal(book.id, book.cover)}
                       >
                         <Trash2 size={20} color="crimson" />
                       </button>
