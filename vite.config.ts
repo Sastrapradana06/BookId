@@ -5,10 +5,22 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   plugins: [
     remix({
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeSplatPath: true,
-        v3_throwAbortReason: true,
+      routes(defineRoutes) {
+        return defineRoutes((route) => {
+          route("api/auth/logout", "routes/api/auth/logout.tsx", {
+            index: true,
+          });
+
+          route("api/tambah-books", "routes/api/books/tambah-books.tsx", {
+            index: true,
+          });
+          route("api/edit-books", "routes/api/books/edit-books.tsx", {
+            index: true,
+          });
+          route("api/delete-books", "routes/api/books/delete-books.tsx", {
+            index: true,
+          });
+        });
       },
     }),
     tsconfigPaths(),

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ActionFunction, json, MetaFunction, redirect } from "@remix-run/node";
+import { json, MetaFunction, redirect } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
@@ -7,7 +7,6 @@ import Container from "~/components/layout/container";
 import FormEdit from "~/components/template/form-edit";
 import StarRating from "~/components/ui/star-rating";
 import { getBooksId } from "~/services/supabase/fetch.server";
-import { updateBook } from "~/services/supabase/update.server";
 import { BookDB } from "~/utils/type";
 import { calculateRating } from "~/utils/utils";
 
@@ -39,49 +38,20 @@ export const loader = async ({ params }: { params: any }) => {
   return json({ success: true, data: result.data });
 };
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const id = Number(formData.get("id"));
-  const dataUpdate = {
-    judul_buku: formData.get("judul_buku"),
-    penulis: formData.get("penulis"),
-    genre: formData.get("genre"),
-    bahasa: formData.get("bahasa"),
-    tahun_terbit: formData.get("tahun_terbit"),
-    pages: parseInt(formData.get("pages") as string, 10),
-    stok: parseInt(formData.get("stok") as string, 10),
-  };
-
-  const result = await updateBook(id, dataUpdate);
-  if (result.status === false) {
-    return json({ success: false, error: result.error });
-  }
-
-  // const result = await deleteBook(id);
-  return json({ success: true, dataUpdate });
-};
-
 export default function DetailBooks() {
   const { data } = useLoaderData<LoaderData>();
   const [isEditModal, setIsEditModal] = useState(false);
-
-  const [dataEdit, setDataEdit] = useState<BookDB | null>(null);
 
   if (!data) return null;
   const detailBook = data[0];
 
   const showModalEdit = () => {
     setIsEditModal(true);
-    setDataEdit(detailBook);
   };
 
   return (
     <>
-      <FormEdit
-        isModal={isEditModal}
-        setIsModal={setIsEditModal}
-        data={dataEdit}
-      />
+      <FormEdit isModal={isEditModal} setIsModal={setIsEditModal} />
       <Container>
         <div className="w-full h-max ">
           <Link to="/books" className="flex items-center gap-1">

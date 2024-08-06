@@ -20,7 +20,7 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
             icon={<LayoutDashboard />}
           />
           <ListLink link="/books" text="books" icon={<BookOpenText />} />
-          <ListLink link="/logout" text="Log out" icon={<LogOut />} />
+          <ListLink link="/api/auth/logout" text="Log out" icon={<LogOut />} />
         </div>
       </div>
     </div>

@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-  MetaFunction,
-  redirect,
-} from "@remix-run/node";
+import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import {
@@ -20,11 +14,9 @@ import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
 import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
-import { deleteBook } from "~/services/supabase/delete.server";
 import { getBooks } from "~/services/supabase/fetch.server";
-import { deleteImg } from "~/services/supabase/storage.server";
 import { BookDB } from "~/utils/type";
-import { extractFilePath, formatDate } from "~/utils/utils";
+import { formatDate } from "~/utils/utils";
 
 type LoaderData = {
   status: boolean;
@@ -39,19 +31,6 @@ export const meta: MetaFunction = () => {
     { title: "Data Books" },
     { name: "Data Books", content: "Welcome to Data books" },
   ];
-};
-
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const id = Number(formData.get("idDelete"));
-  const urlCover = String(formData.get("book_cover"));
-
-  if (urlCover !== "/cover-black.jpeg") {
-    const url = extractFilePath(urlCover);
-    await deleteImg(url);
-  }
-  const result = await deleteBook(id);
-  return json({ success: result.status });
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -69,23 +48,28 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Books() {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
 
-  const [idDelete, setIdDelete] = useState<number>(0);
-  const [urlCoverBook, setUrlCoverBook] = useState<string>("");
+  // const [urlCoverBook, setUrlCoverBook] = useState<string>("");
 
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
+  const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
 
   const { pathname } = useLocation();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
 
   const deleteBuku = async () => {
-    fetcher.submit({ idDelete, book_cover: urlCoverBook }, { method: "post" });
+    fetcher.submit(
+      { idAllDelete },
+      { method: "post", action: "/api/delete-books" }
+    );
   };
 
-  const showDeleteModal = (id: number, urlCover: string) => {
-    setIsDeleteModal(true);
-    setIdDelete(id);
-    setUrlCoverBook(urlCover);
+  const handleCheck = (id: number) => {
+    if (idAllDelete.includes(id)) {
+      setIdAllDelete(idAllDelete.filter((item) => item !== id));
+    } else {
+      setIdAllDelete([...idAllDelete, id]);
+    }
   };
 
   useEffect(() => {
@@ -93,7 +77,7 @@ export default function Books() {
       if (fetcher.data.success) {
         handleAlert("success", "Berhasil menghapus buku");
         setIsDeleteModal(false);
-        setIdDelete(0);
+        setIdAllDelete([]);
       } else {
         setIsDeleteModal(false);
         handleAlert("error", "Gagal menghapus buku");
@@ -136,7 +120,7 @@ export default function Books() {
             Tambah Buku
           </Link>
         </div>
-        <div className="w-full h-max mt-4 flex  flex-wrap lg:justify-between lg:items-center">
+        <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
           <form className="flex items-center w-full lg:w-[40%]">
             <label htmlFor="simple-search" className="sr-only">
               Search
@@ -161,6 +145,16 @@ export default function Books() {
               <span className="sr-only">Search</span>
             </button>
           </form>
+          <div className="w-max h-max  flex items-center gap-2">
+            <button
+              name="button"
+              title="Delete"
+              onClick={() => setIsDeleteModal(true)}
+              className="p-2 rounded-lg bg-red-300"
+            >
+              <Trash2 size={20} color="crimson" />
+            </button>
+          </div>
         </div>
         <div className="min-h-max max-h-[450px] relative overflow-auto  mt-7 border border-gray-400 rounded-md">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -212,6 +206,7 @@ export default function Books() {
                       <input
                         id="checkbox-table-search-1"
                         type="checkbox"
+                        onChange={() => handleCheck(book.id)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                       />
                       <label
@@ -257,13 +252,13 @@ export default function Books() {
                       <Link to={`detail/${book.id}`}>
                         <ScanEye size={20} color="green" />
                       </Link>
-                      <button
+                      {/* <button
                         name="button"
                         title="Delete"
                         onClick={() => showDeleteModal(book.id, book.cover)}
                       >
                         <Trash2 size={20} color="crimson" />
-                      </button>
+                      </button> */}
                     </div>
                   </td>
                 </tr>

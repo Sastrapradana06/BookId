@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BookDB } from "~/utils/type";
 import Input from "../ui/input";
 import Label from "../ui/label";
 import useHandleInput from "hooks/useHandleInput";
@@ -12,11 +11,9 @@ import { useFetcher, useLoaderData } from "@remix-run/react";
 export default function FormEdit({
   isModal,
   setIsModal,
-  data,
 }: {
   isModal: boolean;
   setIsModal: React.Dispatch<React.SetStateAction<boolean>>;
-  data: BookDB | null;
 }) {
   const { status, data: alert, handleAlert } = useHandleAlert();
   const fetcher = useFetcher<any>();
@@ -29,7 +26,7 @@ export default function FormEdit({
     const formData = dataInput;
     fetcher.submit(formData, {
       method: "post",
-      action: "/books/detail/" + data?.id,
+      action: "/api/edit-books",
     });
   };
 
