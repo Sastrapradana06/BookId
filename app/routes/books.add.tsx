@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MetaFunction } from "@remix-run/node";
-import { Link, useFetcher, useLocation } from "@remix-run/react";
+import { Link, useFetcher, useLocation, useNavigate } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import useHandleFile from "hooks/useHandleFile";
 import { ChevronRight } from "lucide-react";
@@ -22,6 +22,7 @@ export default function AddBooks() {
   const fetcher = useFetcher<any>();
 
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const { urlImg, handleFile, reset } = useHandleFile();
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
@@ -57,6 +58,7 @@ export default function AddBooks() {
       if (fetcher.data.success) {
         handleAlert("success", "Berhasil menambahkan data buku");
         resetForm();
+        navigate("/books");
       } else {
         handleAlert("error", fetcher.data.message);
       }

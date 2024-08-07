@@ -33,3 +33,7 @@ export function extractFilePath(url: string) {
     return newUrl;
   }
 }
+
+export function extractFilePathArr(arr: string[]) {
+  return arr.map((url) => extractFilePath(url));
+}

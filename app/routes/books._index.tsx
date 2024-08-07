@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData, useLocation } from "@remix-run/react";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import {
   BookOpenText,
@@ -38,38 +44,62 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!user) {
     return redirect("/");
   }
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
   const dataBuku = await getBooks();
   if (dataBuku.status === false) {
     return json({ status: false, error: dataBuku.error });
   }
+
+  if (q !== null && dataBuku.data) {
+    const filter = dataBuku.data.filter((item: BookDB) =>
+      item.judul_buku.toLowerCase().includes(q.toLowerCase())
+    );
+
+    return json({ status: true, data: filter });
+  }
+
   return json({ status: true, data: dataBuku.data });
 };
 
 export default function Books() {
   const [isDeleteModal, setIsDeleteModal] = useState(false);
 
-  // const [urlCoverBook, setUrlCoverBook] = useState<string>("");
-
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
+  const [urlCoverBook, setUrlCoverBook] = useState<string[]>([]);
   const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
+  const [q, setQ] = useState<string>("");
 
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
 
   const deleteBuku = async () => {
     fetcher.submit(
-      { idAllDelete },
+      { idAllDelete, urlCoverBook },
       { method: "post", action: "/api/delete-books" }
     );
   };
 
-  const handleCheck = (id: number) => {
+  const handleCheck = (id: number, urlCover: string) => {
     if (idAllDelete.includes(id)) {
       setIdAllDelete(idAllDelete.filter((item) => item !== id));
     } else {
       setIdAllDelete([...idAllDelete, id]);
     }
+
+    if (urlCover !== "/cover-black.jpeg" && !urlCoverBook.includes(urlCover)) {
+      setUrlCoverBook([...urlCoverBook, urlCover]);
+    } else {
+      setUrlCoverBook(urlCoverBook.filter((item) => item !== urlCover));
+    }
+  };
+
+  const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    console.log({ q });
+    navigate(`/books?q=${q}`);
   };
 
   useEffect(() => {
@@ -121,39 +151,55 @@ export default function Books() {
           </Link>
         </div>
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
-          <form className="flex items-center w-full lg:w-[40%]">
+          <form
+            className="flex items-center w-full lg:w-[40%]"
+            onSubmit={handelFormSearch}
+          >
             <label htmlFor="simple-search" className="sr-only">
               Search
             </label>
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <div className="relative w-[90%] ">
+              <div className="absolute inset-y-0 start-0 flex items-center ps-5 pointer-events-none">
                 <BookOpenText color="black" size={20} />
               </div>
               <input
                 type="text"
                 id="simple-search"
-                className=" border-2 border-gray-400 text-gray-900 text-sm rounded-lg  block w-full ps-10 p-2.5 bg-transparent outline-none focus:ring-blue-500 focus:border-blue-500"
+                name="q"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className=" border bg-white shadow-lg border-gray-400 text-gray-900 text-sm rounded-3xl  block w-full ps-12 p-3.5 bg-transparent outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Cari buku"
                 required={true}
               />
             </div>
             <button
               type="submit"
-              className="p-2.5 ms-2 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-700"
+              className="p-3 ms-2 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-700 shadow-lg"
             >
               <Search color="white" size={20} />
               <span className="sr-only">Search</span>
             </button>
           </form>
           <div className="w-max h-max  flex items-center gap-2">
-            <button
-              name="button"
-              title="Delete"
-              onClick={() => setIsDeleteModal(true)}
-              className="p-2 rounded-lg bg-red-300"
-            >
-              <Trash2 size={20} color="crimson" />
-            </button>
+            {idAllDelete.length > 0 ? (
+              <button
+                name="button"
+                title="Delete"
+                onClick={() => setIsDeleteModal(true)}
+                className="p-2 rounded-lg bg-red-300 shadow-md"
+              >
+                <Trash2 size={20} color="crimson" />
+              </button>
+            ) : (
+              <button
+                name="button"
+                title="Delete"
+                className="p-2 rounded-lg bg-red-100 cursor-not-allowed"
+              >
+                <Trash2 size={20} color="crimson" />
+              </button>
+            )}
           </div>
         </div>
         <div className="min-h-max max-h-[450px] relative overflow-auto  mt-7 border border-gray-400 rounded-md">
@@ -206,7 +252,7 @@ export default function Books() {
                       <input
                         id="checkbox-table-search-1"
                         type="checkbox"
-                        onChange={() => handleCheck(book.id)}
+                        onChange={() => handleCheck(book.id, book.cover)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                       />
                       <label
