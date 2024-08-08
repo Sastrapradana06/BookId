@@ -27,3 +27,17 @@ export async function insertBook(data: any) {
     return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
   }
 }
+
+export async function insertMembers(data: any) {
+  try {
+    const { error } = await supabase.from("data members").insert([data]);
+
+    if (error) {
+      throw error;
+    }
+
+    return { status: true };
+  } catch (error: any) {
+    return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
+  }
+}

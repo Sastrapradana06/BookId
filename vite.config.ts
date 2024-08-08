@@ -20,6 +20,10 @@ export default defineConfig({
           route("api/delete-books", "routes/api/books/delete-books.tsx", {
             index: true,
           });
+
+          route("api/tambah-members", "routes/api/members/tambah-members.tsx", {
+            index: true,
+          });
         });
       },
     }),

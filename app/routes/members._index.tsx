@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { ChevronRight, Eye, Search, Trash2, UserSearch } from "lucide-react";
+import { ChevronRight, Search, Trash2, UserSearch } from "lucide-react";
 import { useState } from "react";
+import CardMembers from "~/components/layout/card-members";
 import Container from "~/components/layout/container";
 import { isAuthUser } from "~/services/auth.server";
 import { getMembers } from "~/services/supabase/fetch.server";
@@ -108,37 +109,13 @@ export default function Members() {
         </div>
         <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-4 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
           {data?.map((member: any) => (
-            <div
-              className="w-[160px] h-[230px] rounded-lg shadow-md  lg:w-[160px] flex flex-col items-center p-2 bg-gray-700 relative"
+            <CardMembers
               key={member.id}
-            >
-              <span
-                className={`p-2 rounded-full ${
-                  member.status == "aktif" ? "bg-green-500" : "bg-red-500"
-                } animate-pulse absolute top-1 right-1`}
-              ></span>
-              <img
-                src={member.foto_profil}
-                alt="avatar"
-                className="w-24 h-24 mb-3 rounded-full shadow-lg object-cover ring ring-white"
-              />
-              <div className="text-center">
-                <h1 className="font-semibold text-[1rem] text-white capitalize">
-                  {member.username}
-                </h1>
-                <p className="font-semibold text-[.8rem] text-green-300 capitalize">
-                  {member.role}
-                </p>
-              </div>
-              <div className="w-full h-max  flex gap-2 items-center justify-center mt-4">
-                <button className="p-2 rounded-md bg-green-500">
-                  <Eye size={20} color="white" />
-                </button>
-                <button className="p-2 rounded-md bg-red-500">
-                  <Trash2 size={20} color="white" />
-                </button>
-              </div>
-            </div>
+              username={member.username}
+              role={member.role}
+              status={member.status}
+              foto_profil={member.foto_profil}
+            />
           ))}
         </div>
       </section>
