@@ -1,6 +1,8 @@
+import { Link } from "@remix-run/react";
 import { Eye, Trash2 } from "lucide-react";
 
 type CardMembersType = {
+  id: number;
   foto_profil: string;
   username: string;
   role: string;
@@ -8,6 +10,7 @@ type CardMembersType = {
 };
 
 export default function CardMembers({
+  id,
   foto_profil,
   username,
   role,
@@ -34,9 +37,11 @@ export default function CardMembers({
         </p>
       </div>
       <div className="w-full h-max  flex gap-2 items-center justify-center mt-4">
-        <button className="p-2 rounded-md bg-green-500 hover:bg-green-600">
-          <Eye size={20} color="white" />
-        </button>
+        <Link to={`/members/detail/${id}`}>
+          <button className="p-2 rounded-md bg-green-500 hover:bg-green-600">
+            <Eye size={20} color="white" />
+          </button>
+        </Link>
         <button className="p-2 rounded-md bg-red-500 hover:bg-red-600">
           <Trash2 size={20} color="white" />
         </button>

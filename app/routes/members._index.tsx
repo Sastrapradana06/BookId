@@ -23,7 +23,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const dataMembers = await getMembers();
-  console.log(dataMembers);
   if (dataMembers.status === false) {
     return json({ status: false, error: dataMembers.error });
   }
@@ -34,7 +33,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Members() {
   const { pathname } = useLocation();
   const { data } = useLoaderData<LoaderDataMembers>();
-  console.log({ data });
 
   const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
 
@@ -111,6 +109,7 @@ export default function Members() {
           {data?.map((member: any) => (
             <CardMembers
               key={member.id}
+              id={member.id}
               username={member.username}
               role={member.role}
               status={member.status}
