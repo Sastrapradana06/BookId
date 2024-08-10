@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { json, LoaderFunction, redirect } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/node";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import {
   Cake,
   Check,
@@ -9,9 +14,22 @@ import {
   MapPinIcon,
   Phone,
 } from "lucide-react";
-import { useState } from "react";
 import Container from "~/components/layout/container";
 import { getMembersId } from "~/services/supabase/fetch.server";
+import { updateStatusMembers } from "~/services/supabase/update.server";
+
+export const action: ActionFunction = async ({ request, params }) => {
+  const idMember = params.id;
+  if (!idMember) {
+    return redirect("/members");
+  }
+  const formData = await request.formData();
+  const status = formData.get("status") as string;
+  const result = await updateStatusMembers(parseInt(idMember), status);
+  console.log({ result, idMember });
+
+  return json({ success: true, data: result });
+};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const idMember = params.id;
@@ -26,24 +44,30 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function MembersDetail() {
-  const [isActive, setIsActive] = useState(true);
   const loader = useLoaderData<any>();
+  const fetcher = useFetcher();
   const user = loader.data[0];
 
-  console.log({ user });
-
-  // Fungsi untuk menangani perubahan toggle
-  const handleToggle = () => {
-    setIsActive(!isActive);
+  const handleToggleStatus = async () => {
+    fetcher.submit(
+      {
+        status: user.status == "non-aktif" ? "aktif" : "non-aktif",
+      },
+      {
+        method: "post",
+        encType: "multipart/form-data",
+      }
+    );
   };
+
   return (
     <Container>
       <div className="w-full h-max ">
         <Link to="/members" className="flex items-center gap-1">
           <ChevronLeft size={23} color="black" />
         </Link>
-        <div className="w-full h-max mt-6  rounded-lg bg-gray-700 rounded-b-3xl lg:w-[80%] lg:m-auto">
-          <div className="w-max h-max m-auto  flex flex-col items-center gap-3 p-2">
+        <div className="w-full h-max mt-6   bg-gray-700 rounded-3xl flex flex-col items-center lg:flex-row lg:h-[400px] justify-center">
+          <div className="w-max h-max  flex flex-col items-center gap-3 p-2 lg:w-[40%] ">
             <img
               src={user.foto_profil}
               alt="foto profil"
@@ -73,60 +97,63 @@ export default function MembersDetail() {
               </span>
             </div>
           </div>
-          <div className="w-full h-max pb-6 shadow-xl mt-2 rounded-3xl bg-white pt-6">
-            <div className="w-[90%] h-max m-auto flex flex-col lg:flex-row">
+          <div className="w-full h-max pb-6 shadow-xl mt-2 rounded-3xl bg-white pt-6 lg:w-[50%] lg:mt-0 ">
+            <div className="w-[90%] h-max m-auto flex flex-col lg:flex-row ">
               <div className="w-full h-max lg:w-[50%]">
                 <div className="w-full h-max flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span className="p-2 rounded-full bg-green-300">
                       <Check size={15} color="green" />
                     </span>
-                    <p className="capitalize font-semibold">{user.status}</p>
+                    <p className="capitalize font-semibold">
+                      {user.status == "aktif" ? "aktif" : "Tidak Aktif"}
+                    </p>
                   </div>
                   <div className="inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={isActive}
-                      onChange={handleToggle}
+                      checked={user.status == "aktif" ? true : false}
                       className="sr-only peer"
                     />
                     <div
+                      onClick={handleToggleStatus}
+                      aria-hidden="true"
                       className={`relative w-11 h-6 rounded-full transition-colors ${
-                        isActive ? "bg-green-400" : "bg-gray-200"
+                        user.status == "aktif" ? "bg-green-400" : "bg-gray-200"
                       } peer-focus:outline-none peer-focus:ring-4 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`}
-                    />
+                    ></div>
                   </div>
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-5">
                   <div className="flex items-center gap-2">
-                    <span className="p-2 rounded-full bg-pink-500">
+                    <span className="p-2 rounded-full bg-red-500">
                       <Mail size={15} color="white" />
                     </span>
-                    <p>salsa@gmail.com</p>
+                    <p>{user.email}</p>
                   </div>
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-3">
                   <div className="flex items-center gap-2">
-                    <span className="p-2 rounded-full bg-pink-500">
+                    <span className="p-2 rounded-full bg-red-500">
                       <Phone size={15} color="white" />
                     </span>
-                    <p>089812563541</p>
+                    <p>{user.wa}</p>
                   </div>
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-3">
                   <div className="flex items-center gap-2">
-                    <span className="p-2 rounded-full bg-pink-500">
+                    <span className="p-2 rounded-full bg-red-500">
                       <MapPinIcon size={15} color="white" />
                     </span>
-                    <p>Lubuk Pakam</p>
+                    <p className="capitalize">{user.alamat}</p>
                   </div>
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-3">
                   <div className="flex items-center gap-2">
-                    <span className="p-2 rounded-full bg-pink-500">
+                    <span className="p-2 rounded-full bg-red-500">
                       <Cake size={15} color="white" />
                     </span>
-                    <p>12 September 2022</p>
+                    <p>{user.tgl_lahir}</p>
                   </div>
                 </div>
               </div>

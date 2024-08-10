@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-import { ChevronRight, Search, Trash2, UserSearch } from "lucide-react";
-import { useState } from "react";
+import { ChevronRight, Search, UserSearch } from "lucide-react";
 import CardMembers from "~/components/layout/card-members";
 import Container from "~/components/layout/container";
 import { isAuthUser } from "~/services/auth.server";
@@ -21,7 +20,6 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!user) {
     return redirect("/");
   }
-
   const dataMembers = await getMembers();
   if (dataMembers.status === false) {
     return json({ status: false, error: dataMembers.error });
@@ -33,8 +31,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Members() {
   const { pathname } = useLocation();
   const { data } = useLoaderData<LoaderDataMembers>();
-
-  const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
 
   return (
     <Container>
@@ -84,26 +80,6 @@ export default function Members() {
               <span className="sr-only">Search</span>
             </button>
           </form>
-          <div className="w-max h-max  flex items-center gap-2">
-            {idAllDelete.length > 0 ? (
-              <button
-                name="button"
-                title="Delete"
-                // onClick={() => setIsDeleteModal(true)}
-                className="p-2 rounded-lg bg-red-300 shadow-md"
-              >
-                <Trash2 size={20} color="crimson" />
-              </button>
-            ) : (
-              <button
-                name="button"
-                title="Delete"
-                className="p-2 rounded-lg bg-red-100 cursor-not-allowed"
-              >
-                <Trash2 size={20} color="crimson" />
-              </button>
-            )}
-          </div>
         </div>
         <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-4 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
           {data?.map((member: any) => (

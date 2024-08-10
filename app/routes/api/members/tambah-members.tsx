@@ -16,7 +16,7 @@ export const action: ActionFunction = async ({ request }) => {
     const imgProfil = formData.get("img_profil");
 
     const dataForm = {
-      foto_profil: "/pp-cowo.jpeg",
+      foto_profil: "",
       username: formData.get("username") as string,
       email: formData.get("email") as string,
       wa: formData.get("wa") as string,
@@ -27,6 +27,8 @@ export const action: ActionFunction = async ({ request }) => {
       alamat: formData.get("alamat") as string,
       password: generatePassword(formData.get("role") as string),
     };
+
+    console.log(dataForm.jekel);
 
     if (imgProfil && imgProfil instanceof File) {
       if (imgProfil.size != 0 && imgProfil.name != "") {
@@ -39,6 +41,12 @@ export const action: ActionFunction = async ({ request }) => {
             success: false,
             message: "foto profil gagal diunggah",
           });
+        }
+      } else {
+        if (dataForm.jekel == "laki-laki") {
+          dataForm.foto_profil = "/pp-cowok.jpeg";
+        } else {
+          dataForm.foto_profil = "/pp-cewe.jpeg";
         }
       }
     }

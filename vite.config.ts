@@ -24,6 +24,9 @@ export default defineConfig({
           route("api/tambah-members", "routes/api/members/tambah-members.tsx", {
             index: true,
           });
+          route("api/delete-members", "routes/api/members/delete-members.tsx", {
+            index: true,
+          });
         });
       },
     }),
