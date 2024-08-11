@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request }) => {
       return json({ success: true, message: "Member buku ditambahkan" });
     } else {
       if (insertMember.error?.code == "23505") {
-        return json({ success: false, message: "Member sudah ada" });
+        return json({ success: false, message: "Email sudah terdaftar" });
       } else {
         return json({ success: false, message: "Member gagal ditambahkan" });
       }

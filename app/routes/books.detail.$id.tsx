@@ -6,7 +6,7 @@ import { useState } from "react";
 import Container from "~/components/layout/container";
 import FormEdit from "~/components/template/form-edit";
 import StarRating from "~/components/ui/star-rating";
-import { getBooksId } from "~/services/supabase/fetch.server";
+import { getDataById } from "~/services/supabase/fetch.server";
 import { BookDB } from "~/utils/type";
 import { calculateRating } from "~/utils/utils";
 
@@ -30,7 +30,7 @@ export const loader = async ({ params }: { params: any }) => {
   if (!id) {
     return redirect("/books");
   }
-  const result = await getBooksId(id);
+  const result = await getDataById("data buku", id);
 
   if (result.status === false) {
     return redirect("/books");
@@ -142,9 +142,6 @@ export default function DetailBooks() {
                   onClick={showModalEdit}
                 >
                   Edit
-                </button>
-                <button className="w-[100px] py-2 rounded-md bg-red-400 text-white hover:bg-red-500">
-                  Hapus
                 </button>
               </div>
             </div>

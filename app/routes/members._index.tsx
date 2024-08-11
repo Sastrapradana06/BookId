@@ -1,43 +1,96 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, redirect } from "@remix-run/node";
-import { Link, useLoaderData, useLocation } from "@remix-run/react";
+import {
+  Link,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { ChevronRight, Search, UserSearch } from "lucide-react";
+import { useState } from "react";
 import CardMembers from "~/components/layout/card-members";
 import Container from "~/components/layout/container";
 import { isAuthUser } from "~/services/auth.server";
-import { getMembers } from "~/services/supabase/fetch.server";
+import { getDataDb } from "~/services/supabase/fetch.server";
+import { MembersDB } from "~/utils/type";
 
 type LoaderDataMembers = {
   status: boolean;
-  data?: any;
+  data?: MembersDB[];
   error?: {
     code: string;
   };
 };
+
+function filterByStatus(members: MembersDB[], status: string): MembersDB[] {
+  if (status === "aktif") {
+    return members.filter((item) => item.status === "aktif");
+  } else if (status === "non-aktif") {
+    return members.filter((item) => item.status === "non-aktif");
+  }
+  return members;
+}
+
+function filterByQuery(members: MembersDB[], query: string): MembersDB[] {
+  return members.filter((item) =>
+    item.username.toLowerCase().includes(query.toLowerCase())
+  );
+}
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await isAuthUser(request);
   if (!user) {
     return redirect("/");
   }
-  const dataMembers = await getMembers();
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const status = url.searchParams.get("status");
+
+  const dataMembers = await getDataDb("data members");
   if (dataMembers.status === false) {
     return json({ status: false, error: dataMembers.error });
   }
 
-  return json({ status: true, data: dataMembers.data });
+  let filteredMembers = dataMembers.data || [];
+
+  if (status) {
+    filteredMembers = filterByStatus(filteredMembers, status);
+  }
+
+  if (q) {
+    filteredMembers = filterByQuery(filteredMembers, q);
+  }
+
+  return json({ status: true, data: filteredMembers });
 };
 
 export default function Members() {
   const { pathname } = useLocation();
   const { data } = useLoaderData<LoaderDataMembers>();
+  const [q, setQ] = useState<string>("");
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const status = searchParams.get("status");
+  console.log({ status });
+
+  const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (q.length < 3) return;
+    console.log({ q });
+    navigate(`/members?q=${q}`);
+  };
+
+  const handleStatusParams = (status: string) => {
+    navigate(`/members?status=${status}`);
+  };
 
   return (
     <Container>
       <section className="mt-1 lg:mt-0">
         <div className="w-max flex items-center gap-1">
           <Link
-            to="/members"
+            to="/members?status=semua"
             className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
               pathname === "/members" ? "text-gray-500" : "text-gray-400"
             }`}
@@ -54,8 +107,11 @@ export default function Members() {
             Tambah Member
           </Link>
         </div>
-        <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
-          <form className="flex items-center w-full lg:w-[40%]">
+        <div className="w-full h-max mt-4 ">
+          <form
+            className="flex items-center w-full lg:w-[40%]"
+            onSubmit={handelFormSearch}
+          >
             <label htmlFor="simple-search" className="sr-only">
               Search
             </label>
@@ -67,6 +123,8 @@ export default function Members() {
                 type="text"
                 id="simple-search"
                 name="q"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
                 className=" border bg-white shadow-lg border-gray-400 text-gray-900 text-sm rounded-3xl  block w-full ps-12 p-3.5 bg-transparent outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Cari member..."
                 required={true}
@@ -81,6 +139,50 @@ export default function Members() {
             </button>
           </form>
         </div>
+        <div className="w-full h-max  mt-2">
+          <div className="w-max flex  items-center gap-3">
+            <p className="font-semibold text-[.9rem]">Status :</p>
+            <div className="flex items-center gap-3 lg:gap-4">
+              <button
+                onClick={() => handleStatusParams("semua")}
+                className={`text-[.8rem] px-3 text-white rounded-md  ${
+                  status == "semua"
+                    ? "bg-red-500"
+                    : "bg-transparent text-black border border-gray-500"
+                }`}
+              >
+                Semua
+              </button>
+              <button
+                onClick={() => handleStatusParams("aktif")}
+                className={`text-[.8rem] px-3 text-white rounded-md  ${
+                  status == "aktif"
+                    ? "bg-red-500"
+                    : "bg-transparent text-black border border-gray-500"
+                }`}
+              >
+                Aktif
+              </button>
+              <button
+                onClick={() => handleStatusParams("non-aktif")}
+                className={`text-[.8rem] px-3 text-white rounded-md  ${
+                  status == "non-aktif"
+                    ? "bg-red-500"
+                    : "bg-transparent text-black border border-gray-500"
+                }`}
+              >
+                Tidak Aktif
+              </button>
+            </div>
+          </div>
+        </div>
+        {data?.length == 0 && (
+          <div className=" mt-10">
+            <h1 className="text-[.9rem] font-semibold text-center text-red-500">
+              Tidak ada data yang ditampilkan
+            </h1>
+          </div>
+        )}
         <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-4 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
           {data?.map((member: any) => (
             <CardMembers

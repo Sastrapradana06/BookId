@@ -13,3 +13,17 @@ export type BookDB = {
   pengembalian: number;
   cover: string;
 };
+
+export type MembersDB = {
+  id: number;
+  created_at: Date | string;
+  foto_profil: string;
+  username: string;
+  email: string;
+  wa: string;
+  alamat: string;
+  tgl_lahir: Date | string;
+  jekel: string;
+  role: string;
+  status: string;
+};

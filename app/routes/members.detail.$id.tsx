@@ -15,7 +15,7 @@ import {
   Phone,
 } from "lucide-react";
 import Container from "~/components/layout/container";
-import { getMembersId } from "~/services/supabase/fetch.server";
+import { getDataById } from "~/services/supabase/fetch.server";
 import { updateStatusMembers } from "~/services/supabase/update.server";
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -26,7 +26,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
   const status = formData.get("status") as string;
   const result = await updateStatusMembers(parseInt(idMember), status);
-  console.log({ result, idMember });
 
   return json({ success: true, data: result });
 };
@@ -36,7 +35,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   if (!idMember) {
     return redirect("/members");
   }
-  const getMember = await getMembersId(parseInt(idMember));
+  const getMember = await getDataById("data members", parseInt(idMember));
   if (getMember.status === false) {
     return redirect("/members");
   }

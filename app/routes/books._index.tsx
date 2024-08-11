@@ -20,7 +20,7 @@ import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
 import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
-import { getBooks } from "~/services/supabase/fetch.server";
+import { getDataDb } from "~/services/supabase/fetch.server";
 import { BookDB } from "~/utils/type";
 import { formatDate } from "~/utils/utils";
 
@@ -46,7 +46,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
-  const dataBuku = await getBooks();
+  const dataBuku = await getDataDb("data buku");
   if (dataBuku.status === false) {
     return json({ status: false, error: dataBuku.error });
   }

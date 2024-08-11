@@ -25,7 +25,11 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
             icon={<LayoutDashboard />}
           />
           <ListLink link="/books" text="books" icon={<BookOpenText />} />
-          <ListLink link="/members" text="members" icon={<CircleUserRound />} />
+          <ListLink
+            link="/members?status=semua"
+            text="members"
+            icon={<CircleUserRound />}
+          />
           <ListLink link="/api/auth/logout" text="Log out" icon={<LogOut />} />
         </div>
       </div>
