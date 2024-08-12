@@ -33,9 +33,23 @@ function filterByStatus(members: MembersDB[], status: string): MembersDB[] {
 }
 
 function filterByQuery(members: MembersDB[], query: string): MembersDB[] {
-  return members.filter((item) =>
+  const filteredNama = members.filter((item) =>
     item.username.toLowerCase().includes(query.toLowerCase())
   );
+
+  const filteredRole = members.filter((item) => {
+    return item.role.toLowerCase() === query.toLowerCase();
+  });
+
+  const filteredJekel = members.filter((item) => {
+    return item.jekel.toLowerCase() === query.toLowerCase();
+  });
+
+  const filteredResults = [
+    ...new Set([...filteredNama, ...filteredRole, ...filteredJekel]),
+  ];
+
+  return filteredResults;
 }
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -72,12 +86,10 @@ export default function Members() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const status = searchParams.get("status");
-  console.log({ status });
 
   const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (q.length < 3) return;
-    console.log({ q });
     navigate(`/members?q=${q}`);
   };
 
@@ -90,7 +102,7 @@ export default function Members() {
       <section className="mt-1 lg:mt-0">
         <div className="w-max flex items-center gap-1">
           <Link
-            to="/members?status=semua"
+            to="/members"
             className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
               pathname === "/members" ? "text-gray-500" : "text-gray-400"
             }`}
@@ -126,7 +138,7 @@ export default function Members() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 className=" border bg-white shadow-lg border-gray-400 text-gray-900 text-sm rounded-3xl  block w-full ps-12 p-3.5 bg-transparent outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Cari member..."
+                placeholder="Cari nama, role, jekel..."
                 required={true}
               />
             </div>
@@ -139,35 +151,35 @@ export default function Members() {
             </button>
           </form>
         </div>
-        <div className="w-full h-max  mt-2">
+        <div className="w-full h-max  mt-4 ">
           <div className="w-max flex  items-center gap-3">
             <p className="font-semibold text-[.9rem]">Status :</p>
             <div className="flex items-center gap-3 lg:gap-4">
               <button
                 onClick={() => handleStatusParams("semua")}
-                className={`text-[.8rem] px-3 text-white rounded-md  ${
-                  status == "semua"
-                    ? "bg-red-500"
-                    : "bg-transparent text-black border border-gray-500"
+                className={`text-[.8rem] px-3 rounded-md  lg:px-4 lg:py-[1px] ${
+                  status == "semua" || !status
+                    ? "bg-red-500 text-white"
+                    : "bg-transparent text-black border  border-gray-500"
                 }`}
               >
                 Semua
               </button>
               <button
                 onClick={() => handleStatusParams("aktif")}
-                className={`text-[.8rem] px-3 text-white rounded-md  ${
+                className={`text-[.8rem] px-3  rounded-md lg:px-4 lg:py-[1px]  ${
                   status == "aktif"
-                    ? "bg-red-500"
-                    : "bg-transparent text-black border border-gray-500"
+                    ? "bg-red-500 text-white"
+                    : "bg-transparent text-black border  border-gray-500"
                 }`}
               >
                 Aktif
               </button>
               <button
                 onClick={() => handleStatusParams("non-aktif")}
-                className={`text-[.8rem] px-3 text-white rounded-md  ${
+                className={`text-[.8rem] px-3  rounded-md lg:px-4 lg:py-[1px]  ${
                   status == "non-aktif"
-                    ? "bg-red-500"
+                    ? "bg-red-500 text-white"
                     : "bg-transparent text-black border border-gray-500"
                 }`}
               >
@@ -183,7 +195,7 @@ export default function Members() {
             </h1>
           </div>
         )}
-        <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-4 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
+        <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-6 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
           {data?.map((member: any) => (
             <CardMembers
               key={member.id}

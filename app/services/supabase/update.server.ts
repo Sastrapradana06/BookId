@@ -26,8 +26,23 @@ export const updateStatusMembers = async (id: number, status: string) => {
     if (error) {
       throw error;
     }
-    return { status: true };
+    return { status: true, message: "Status member diperbarui" };
   } catch (error: any) {
-    return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
+    return { status: false, message: { code: error.code || "UNKNOWN_ERROR" } };
+  }
+};
+
+export const updateRoleMembers = async (id: number, newRole: string) => {
+  try {
+    const { error } = await supabase
+      .from("data members")
+      .update({ role: newRole })
+      .eq("id", id);
+    if (error) {
+      throw error;
+    }
+    return { status: true, message: "Role member berhasil diperbarui" };
+  } catch (error: any) {
+    return { status: false, message: { code: error.code || "UNKNOWN_ERROR" } };
   }
 };

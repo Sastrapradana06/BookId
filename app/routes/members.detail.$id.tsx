@@ -6,28 +6,50 @@ import {
   redirect,
 } from "@remix-run/node";
 import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import useHandleAlert from "hooks/useHandleAlert";
 import {
   Cake,
   Check,
   ChevronLeft,
   Mail,
   MapPinIcon,
+  PenLine,
   Phone,
+  UserRoundCog,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
+import Alert from "~/components/ui/alert";
+import Label from "~/components/ui/label";
 import { getDataById } from "~/services/supabase/fetch.server";
-import { updateStatusMembers } from "~/services/supabase/update.server";
+import {
+  updateRoleMembers,
+  updateStatusMembers,
+} from "~/services/supabase/update.server";
+import { MembersDB } from "~/utils/type";
+
+type LoaderDataType = {
+  success: boolean;
+  data: MembersDB[];
+};
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const idMember = params.id;
-  if (!idMember) {
-    return redirect("/members");
-  }
   const formData = await request.formData();
   const status = formData.get("status") as string;
-  const result = await updateStatusMembers(parseInt(idMember), status);
+  const role = formData.get("role") as string;
+  console.log({ status, role });
 
-  return json({ success: true, data: result });
+  if (status) {
+    const idMember = params.id as string;
+    const result = await updateStatusMembers(parseInt(idMember), status);
+    return json({ success: result.status, message: result.message });
+  }
+
+  if (role) {
+    const idMember = params.id as string;
+    const result = await updateRoleMembers(parseInt(idMember), role);
+    return json({ success: result.status, message: result.message });
+  }
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -43,10 +65,12 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function MembersDetail() {
-  const loader = useLoaderData<any>();
-  const fetcher = useFetcher();
+  const loader = useLoaderData<LoaderDataType>();
+  const fetcher = useFetcher<any>();
   const user = loader.data[0];
-
+  const [roleUpdate, setRoleUpdate] = useState(user.role || "user");
+  const [isFormModal, setIsFormModal] = useState(false);
+  const { status, data: dataAlert, handleAlert } = useHandleAlert();
   const handleToggleStatus = async () => {
     fetcher.submit(
       {
@@ -59,8 +83,72 @@ export default function MembersDetail() {
     );
   };
 
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    fetcher.submit(
+      { role: roleUpdate },
+      { method: "post", encType: "multipart/form-data" }
+    );
+    setIsFormModal(false);
+  };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data.success) {
+        handleAlert("success", fetcher.data.message);
+      } else {
+        handleAlert("error", "gagal update role");
+      }
+    }
+  }, [fetcher.data, fetcher.state]);
+
   return (
     <Container>
+      <>
+        <Alert
+          status={status}
+          type={dataAlert?.type}
+          message={dataAlert?.message}
+        />
+        {isFormModal && (
+          <div className="modal">
+            <form
+              onSubmit={handleSubmitForm}
+              className="w-[90%] m-auto h-max lg:w-[40%] bg-slate-100 p-2 rounded-lg shadow-md"
+            >
+              <div className="w-full h-max">
+                <Label htmlFor="role" teks="Pilih Role" />
+                <select
+                  id="role"
+                  name="role"
+                  value={roleUpdate}
+                  onChange={(e) => setRoleUpdate(e.target.value)}
+                  className="w-full rounded-lg  mt-2 h-[40px] px-2 text-[.9rem] bg-transparent border border-gray-300"
+                >
+                  <option value="super admin">Super Admin</option>
+                  <option value="admin">Admin</option>
+                  <option value="member">Member</option>
+                </select>
+              </div>
+              <div className="w-full flex items-center gap-2 mt-3">
+                <button
+                  className="text-[.8rem] px-5 py-1.5 rounded-lg bg-green-500 text-white hover:bg-green-600"
+                  type="submit"
+                >
+                  Simpan
+                </button>
+                <button
+                  onClick={() => setIsFormModal(false)}
+                  className="text-[.8rem] px-5 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600"
+                  type="button"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+      </>
       <div className="w-full h-max ">
         <Link to="/members" className="flex items-center gap-1">
           <ChevronLeft size={23} color="black" />
@@ -98,7 +186,7 @@ export default function MembersDetail() {
           </div>
           <div className="w-full h-max pb-6 shadow-xl mt-2 rounded-3xl bg-white pt-6 lg:w-[50%] lg:mt-0 ">
             <div className="w-[90%] h-max m-auto flex flex-col lg:flex-row ">
-              <div className="w-full h-max lg:w-[50%]">
+              <div className="w-full h-max lg:w-[60%]">
                 <div className="w-full h-max flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <span className="p-2 rounded-full bg-green-300">
@@ -122,6 +210,17 @@ export default function MembersDetail() {
                       } peer-focus:outline-none peer-focus:ring-4 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`}
                     ></div>
                   </div>
+                </div>
+                <div className="w-full h-max flex justify-between items-center mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="p-2 rounded-full bg-cyan-500">
+                      <UserRoundCog size={15} color="white" />
+                    </span>
+                    <p className="capitalize font-semibold">{user.role}</p>
+                  </div>
+                  <button onClick={() => setIsFormModal(true)}>
+                    <PenLine size={23} color="green" />
+                  </button>
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-5">
                   <div className="flex items-center gap-2">
