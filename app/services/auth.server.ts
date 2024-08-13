@@ -2,6 +2,8 @@
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { sessionStorage } from "~/services/session.server";
+import { getuserByEmail } from "./supabase/fetch.server";
+import { comparePassword } from "~/utils/utils";
 
 interface User {
   id: string;
@@ -15,12 +17,40 @@ authenticator.use(
     const email = form.get("email");
     const password = form.get("password");
 
-    if (email === "admin@gmail.com" && password === "123456") {
-      return { id: "1", name: "Gakiong Khun", role: "super admin" };
+    const login = await handleLogin(email as string, password as string);
+
+    if (!login.success) {
+      throw new Error(login.message);
     }
-    throw new Error("Invalid credentials");
+
+    return login.user;
   })
 );
+
+export const handleLogin = async (email: string, password: string) => {
+  const user = await getuserByEmail(email);
+
+  if (user.status === false || user.data.length === 0) {
+    return {
+      success: false,
+      message: "Email tidak terdaftar",
+    };
+  }
+
+  const validatePassword = comparePassword(password, user.data[0].password);
+
+  if (!validatePassword) {
+    return {
+      success: false,
+      message: "Password salah",
+    };
+  }
+  return {
+    success: true,
+    message: "Login Berhasil",
+    user: user.data[0],
+  };
+};
 
 async function getUser(request: Request) {
   const user = await authenticator.isAuthenticated(request);

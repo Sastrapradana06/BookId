@@ -91,8 +91,8 @@ export default function Dashboard() {
       <main className="">
         <div className="w-full h-[200px] bg-indigo-200 rounded-lg flex justify-center items-center p-2 gap-2">
           <div className="w-[50%] h-max ">
-            <h1 className="text-[1.5rem] font-semibold zain lg:text-[2rem]">
-              Hi, {user.name}
+            <h1 className="text-[1.5rem] font-semibold zain lg:text-[2rem] capitalize">
+              Hi, {user.username}
             </h1>
             <p className="text-[1rem] text-gray-500 zain font-semibold lg:text-[1.2rem]">
               &rdquo;Semoga kamu selalu semangat dalam menjalani hidupmu&rdquo;

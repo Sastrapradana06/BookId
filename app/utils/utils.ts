@@ -1,5 +1,37 @@
 import crypto from "crypto";
 
+export function getDay() {
+  const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const sekarang = new Date();
+  const index = sekarang.getDay();
+
+  return hari[index];
+}
+
+export function getFormattedDate() {
+  const bulan = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  const sekarang = new Date();
+  const tanggal = sekarang.getDate();
+  const bulanNama = bulan[sekarang.getMonth()];
+  const tahun = sekarang.getFullYear();
+
+  return `${tanggal} ${bulanNama} ${tahun}`;
+}
+
 export function getFirstLetters(name: string) {
   const words = name.split(" ");
   const firstLetters = words.map((word) => word.charAt(0));

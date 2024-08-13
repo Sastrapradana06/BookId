@@ -2,11 +2,12 @@ import { Mail, SquareMenu } from "lucide-react";
 import Sidebar from "./sidebar";
 import { useState } from "react";
 import { useOutletContext } from "@remix-run/react";
-import { getFirstLetters } from "~/utils/utils";
 import { UserContext } from "~/utils/type";
+import { getDay, getFormattedDate } from "~/utils/utils";
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const { user } = useOutletContext<UserContext>();
 
   return (
@@ -22,23 +23,31 @@ export default function Navbar() {
           >
             <SquareMenu size={33} />
           </button>
-          <div className="w-max h-max  lg:flex flex-col -ml-16  lg:-ml-0">
+          <div className="w-max h-max  lg:flex flex-col -ml-10  lg:-ml-0">
             <h1 className="font-semibold text-[1rem] lg:text-[1.3rem] capitalize">
               {user.role}
             </h1>
-            <p className="text-[.9rem] text-gray-400 font-semibold">
+            <p className="text-[.8rem] text-gray-400 font-semibold lg:text-[.9rem]">
               <span className="text-indigo-600 text-[.8rem] lg:text-[1rem]">
-                Selasa
+                {getDay()}
               </span>
-              , 23 Juli 2024
+              , {getFormattedDate()}
             </p>
           </div>
           <div className="w-max h-max flex items-center gap-4 lg:gap-6">
             <Mail size={25} color="gray" />
-            <button className="p-2 rounded-lg text-[.8rem] bg-indigo-200 text-indigo-500 font-semibold lg:-mr-4 uppercase">
-              {getFirstLetters(user.name)}
-            </button>
-            <p className="hidden lg:block capitalize">{user.name}</p>
+            <img
+              src={user.foto_profil}
+              alt="avatar"
+              className="w-[40px] h-[40px] object-cover rounded-lg ring-2 ring-gray-600"
+            />
+            <p
+              className={`hidden lg:block capitalize lg:-ml-3  font-semibold ${
+                user.jekel == "perempuan" ? "text-pink-600" : "text-indigo-600"
+              }`}
+            >
+              {user.username}
+            </p>
           </div>
         </div>
       </nav>

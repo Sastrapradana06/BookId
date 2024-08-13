@@ -1,4 +1,19 @@
-export type UserContext = { user: { id: string; name: string; role: string } };
+export type UserContext = {
+  user: {
+    id: number;
+    created_at: Date | string;
+    foto_profil: string;
+    username: string;
+    email: string;
+    wa: string;
+    alamat: string;
+    tgl_lahir: Date | string;
+    jekel: string;
+    role: string;
+    status: string;
+    password?: string;
+  };
+};
 export type BookDB = {
   id: number;
   created_at: Date | string;

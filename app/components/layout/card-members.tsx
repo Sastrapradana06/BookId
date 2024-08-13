@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, useFetcher } from "@remix-run/react";
+import { Link, useFetcher, useOutletContext } from "@remix-run/react";
 import { Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 import ModalDelete from "./modal-delete";
+import { UserContext } from "~/utils/type";
 
 type CardMembersType = {
   id: number;
@@ -22,6 +23,7 @@ export default function CardMembers({
   const [isDeleteModal, setIsDeleteModal] = useState(false);
 
   const fetcher = useFetcher<any>();
+  const { user } = useOutletContext<UserContext>();
 
   const deleteMember = () => {
     fetcher.submit(
@@ -74,12 +76,14 @@ export default function CardMembers({
               <Eye size={20} color="white" />
             </button>
           </Link>
-          <button
-            className="p-2 rounded-md bg-red-500 hover:bg-red-600"
-            onClick={() => setIsDeleteModal(true)}
-          >
-            <Trash2 size={20} color="white" />
-          </button>
+          {user.role == "super admin" || user.role == "admin" ? (
+            <button
+              className="p-2 rounded-md bg-red-500 hover:bg-red-600"
+              onClick={() => setIsDeleteModal(true)}
+            >
+              <Trash2 size={20} color="white" />
+            </button>
+          ) : null}
         </div>
       </div>
     </>

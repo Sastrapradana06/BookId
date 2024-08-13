@@ -5,6 +5,7 @@ import {
   useLoaderData,
   useLocation,
   useNavigate,
+  useOutletContext,
   useSearchParams,
 } from "@remix-run/react";
 import { ChevronRight, Search, UserSearch } from "lucide-react";
@@ -13,7 +14,7 @@ import CardMembers from "~/components/layout/card-members";
 import Container from "~/components/layout/container";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import { MembersDB } from "~/utils/type";
+import { MembersDB, UserContext } from "~/utils/type";
 
 type LoaderDataMembers = {
   status: boolean;
@@ -86,6 +87,7 @@ export default function Members() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const status = searchParams.get("status");
+  const { user } = useOutletContext<UserContext>();
 
   const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -110,14 +112,16 @@ export default function Members() {
             Members
           </Link>
           <ChevronRight size={18} className="mt-[1px]" />
-          <Link
-            to="add"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/members/add" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Tambah Member
-          </Link>
+          {user.role === "super admin" || user.role === "admin" ? (
+            <Link
+              to="add"
+              className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
+                pathname === "/members/add" ? "text-gray-500" : "text-gray-400"
+              }`}
+            >
+              Tambah Member
+            </Link>
+          ) : null}
         </div>
         <div className="w-full h-max mt-4 ">
           <form

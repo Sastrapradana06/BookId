@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
 import Logo from "~/components/ui/logo";
 import { json, redirect, useActionData } from "@remix-run/react";
@@ -15,6 +16,7 @@ export const meta: MetaFunction = () => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const user = await authenticator.authenticate("form", request);
+
     const session = await getSession(request.headers.get("Cookie"));
     session.set(authenticator.sessionKey, user);
 
@@ -23,10 +25,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         "Set-Cookie": await commitSession(session),
       },
     });
-  } catch (error) {
-    console.error("Authentication error:", error);
+  } catch (error: any) {
     return json(
-      { success: false, message: "Invalid email or password" },
+      { success: false, message: "Periksa kembali email dan password" },
       { status: 401 }
     );
   }

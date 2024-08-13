@@ -5,7 +5,12 @@ import {
   LoaderFunction,
   redirect,
 } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  useFetcher,
+  useLoaderData,
+  useOutletContext,
+} from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import {
   Cake,
@@ -21,12 +26,13 @@ import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
 import Alert from "~/components/ui/alert";
 import Label from "~/components/ui/label";
+import Loading from "~/components/ui/loading";
 import { getDataById } from "~/services/supabase/fetch.server";
 import {
   updateRoleMembers,
   updateStatusMembers,
 } from "~/services/supabase/update.server";
-import { MembersDB } from "~/utils/type";
+import { MembersDB, UserContext } from "~/utils/type";
 
 type LoaderDataType = {
   success: boolean;
@@ -71,6 +77,9 @@ export default function MembersDetail() {
   const [roleUpdate, setRoleUpdate] = useState(user.role || "user");
   const [isFormModal, setIsFormModal] = useState(false);
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
+  const {
+    user: { role },
+  } = useOutletContext<UserContext>();
   const handleToggleStatus = async () => {
     fetcher.submit(
       {
@@ -148,6 +157,7 @@ export default function MembersDetail() {
             </form>
           </div>
         )}
+        <Loading status={fetcher.state !== "idle"} />
       </>
       <div className="w-full h-max ">
         <Link to="/members" className="flex items-center gap-1">
@@ -196,20 +206,24 @@ export default function MembersDetail() {
                       {user.status == "aktif" ? "aktif" : "Tidak Aktif"}
                     </p>
                   </div>
-                  <div className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={user.status == "aktif" ? true : false}
-                      className="sr-only peer"
-                    />
-                    <div
-                      onClick={handleToggleStatus}
-                      aria-hidden="true"
-                      className={`relative w-11 h-6 rounded-full transition-colors ${
-                        user.status == "aktif" ? "bg-green-400" : "bg-gray-200"
-                      } peer-focus:outline-none peer-focus:ring-4 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`}
-                    ></div>
-                  </div>
+                  {role == "super admin" || role == "admin" ? (
+                    <div className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={user.status == "aktif" ? true : false}
+                        className="sr-only peer"
+                      />
+                      <div
+                        onClick={handleToggleStatus}
+                        aria-hidden="true"
+                        className={`relative w-11 h-6 rounded-full transition-colors ${
+                          user.status == "aktif"
+                            ? "bg-green-400"
+                            : "bg-gray-200"
+                        } peer-focus:outline-none peer-focus:ring-4 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all`}
+                      ></div>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-2">
                   <div className="flex items-center gap-2">
@@ -218,9 +232,11 @@ export default function MembersDetail() {
                     </span>
                     <p className="capitalize font-semibold">{user.role}</p>
                   </div>
-                  <button onClick={() => setIsFormModal(true)}>
-                    <PenLine size={23} color="green" />
-                  </button>
+                  {role == "super admin" ? (
+                    <button onClick={() => setIsFormModal(true)}>
+                      <PenLine size={23} color="green" />
+                    </button>
+                  ) : null}
                 </div>
                 <div className="w-full h-max flex justify-between items-center mt-5">
                   <div className="flex items-center gap-2">
