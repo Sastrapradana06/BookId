@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from "@remix-run/node";
 import Logo from "~/components/ui/logo";
-import { json, redirect, useActionData } from "@remix-run/react";
-import { authenticator } from "~/services/auth.server";
-import { commitSession, getSession } from "~/services/session.server";
+
 import FormLogin from "~/components/template/form-login";
 
 export const meta: MetaFunction = () => {
@@ -13,28 +11,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  try {
-    const user = await authenticator.authenticate("form", request);
-
-    const session = await getSession(request.headers.get("Cookie"));
-    session.set(authenticator.sessionKey, user);
-
-    return redirect("/dashboard", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
-  } catch (error: any) {
-    return json(
-      { success: false, message: "Periksa kembali email dan password" },
-      { status: 401 }
-    );
-  }
-};
-
 export default function Index() {
-  const actionData = useActionData<typeof action>();
   return (
     <main className="w-full h-[100vh]   flex flex-col items-center justify-center ">
       <div className="w-max h-[100px]  ">
@@ -48,7 +25,7 @@ export default function Index() {
             className="w-[400px]  object-contain"
           />
         </div>
-        <FormLogin actionData={actionData} />
+        <FormLogin />
       </div>
     </main>
   );

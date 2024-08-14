@@ -16,5 +16,13 @@ export default function () {
     }, 2000);
   };
 
-  return { status, data, handleAlert };
+  const reset = () => {
+    setStatus(false);
+    setData({
+      type: "",
+      message: "",
+    });
+  };
+
+  return { status, data, handleAlert, reset };
 }

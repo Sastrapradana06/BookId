@@ -3,6 +3,7 @@ import {
   CircleUserRound,
   LayoutDashboard,
   LogOut,
+  UserCog,
 } from "lucide-react";
 import ListLink from "../ui/list-link";
 
@@ -26,6 +27,8 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
           />
           <ListLink link="/books" text="books" icon={<BookOpenText />} />
           <ListLink link="/members" text="members" icon={<CircleUserRound />} />
+          <ListLink link="/profile" text="profile" icon={<UserCog />} />
+
           <ListLink link="/api/auth/logout" text="Log out" icon={<LogOut />} />
         </div>
       </div>

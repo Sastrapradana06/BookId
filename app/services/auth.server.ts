@@ -18,9 +18,8 @@ authenticator.use(
     const password = form.get("password");
 
     const login = await handleLogin(email as string, password as string);
-
     if (!login.success) {
-      throw new Error(login.message);
+      return login;
     }
 
     return login.user;
@@ -42,7 +41,7 @@ export const handleLogin = async (email: string, password: string) => {
   if (!validatePassword) {
     return {
       success: false,
-      message: "Password salah",
+      message: "Periksa kembali password anda",
     };
   }
   return {

@@ -7,6 +7,9 @@ export default defineConfig({
     remix({
       routes(defineRoutes) {
         return defineRoutes((route) => {
+          route("api/auth/login", "routes/api/auth/login.tsx", {
+            index: true,
+          });
           route("api/auth/logout", "routes/api/auth/logout.tsx", {
             index: true,
           });
