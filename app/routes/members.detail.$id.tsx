@@ -3,6 +3,7 @@ import {
   ActionFunction,
   json,
   LoaderFunction,
+  MetaFunction,
   redirect,
 } from "@remix-run/node";
 import {
@@ -37,6 +38,13 @@ import { MembersDB, UserContext } from "~/utils/type";
 type LoaderDataType = {
   success: boolean;
   data: MembersDB[];
+};
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Detail Members" },
+    { name: "Members", content: "Welcome to Members" },
+  ];
 };
 
 export const action: ActionFunction = async ({ request, params }) => {

@@ -1,20 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { json, LoaderFunction, redirect } from "@remix-run/node";
-import {
-  Link,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-  useOutletContext,
-  useSearchParams,
-} from "@remix-run/react";
-import { ChevronRight, Search, UserSearch } from "lucide-react";
+import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
+import { useLoaderData, useNavigate, useSearchParams } from "@remix-run/react";
+import { Search, UserSearch } from "lucide-react";
 import { useState } from "react";
 import CardMembers from "~/components/layout/card-members";
 import Container from "~/components/layout/container";
+import NavLink from "~/components/layout/nav-link";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import { MembersDB, UserContext } from "~/utils/type";
+import { MembersDB } from "~/utils/type";
 
 type LoaderDataMembers = {
   status: boolean;
@@ -22,6 +16,24 @@ type LoaderDataMembers = {
   error?: {
     code: string;
   };
+};
+
+const dataLink = [
+  {
+    name: "members",
+    link: "/members",
+  },
+  {
+    name: "tambah member",
+    link: "/members/add",
+  },
+];
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Members" },
+    { name: "Data Members", content: "Welcome to Data Members" },
+  ];
 };
 
 function filterByStatus(members: MembersDB[], status: string): MembersDB[] {
@@ -81,13 +93,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Members() {
-  const { pathname } = useLocation();
   const { data } = useLoaderData<LoaderDataMembers>();
   const [q, setQ] = useState<string>("");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const status = searchParams.get("status");
-  const { user } = useOutletContext<UserContext>();
 
   const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,27 +112,7 @@ export default function Members() {
   return (
     <Container>
       <section className="mt-1 lg:mt-0">
-        <div className="w-max flex items-center gap-1">
-          <Link
-            to="/members"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/members" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Members
-          </Link>
-          <ChevronRight size={18} className="mt-[1px]" />
-          {user.role === "super admin" || user.role === "admin" ? (
-            <Link
-              to="add"
-              className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-                pathname === "/members/add" ? "text-gray-500" : "text-gray-400"
-              }`}
-            >
-              Tambah Member
-            </Link>
-          ) : null}
-        </div>
+        <NavLink dataLink={dataLink} />
         <div className="w-full h-max mt-4 ">
           <form
             className="flex items-center w-full lg:w-[40%]"

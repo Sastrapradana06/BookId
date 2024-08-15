@@ -1,17 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Link, useFetcher, useLocation, useNavigate } from "@remix-run/react";
+import { MetaFunction } from "@remix-run/node";
+import { useFetcher, useNavigate } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import useHandleFile from "hooks/useHandleFile";
-import { ChevronRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 import Container from "~/components/layout/container";
+import NavLink from "~/components/layout/nav-link";
 import Alert from "~/components/ui/alert";
 import Input from "~/components/ui/input";
 import Label from "~/components/ui/label";
 import Loading from "~/components/ui/loading";
+const dataLink = [
+  {
+    name: "members",
+    link: "/members",
+  },
+  {
+    name: "tambah member",
+    link: "/members/add",
+  },
+];
+
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Tambah Members" },
+    { name: "Members", content: "Welcome to Members" },
+  ];
+};
 
 export default function MembersAdd() {
-  const { pathname } = useLocation();
   const { urlImg, handleFile, reset } = useHandleFile();
   const fetcher = useFetcher<any>();
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
@@ -71,25 +88,7 @@ export default function MembersAdd() {
         />
       </>
       <section className="mt-1 lg:mt-0">
-        <div className="w-max flex items-center gap-1">
-          <Link
-            to="/members"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/books" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Members
-          </Link>
-          <ChevronRight size={18} className="mt-[1px]" />
-          <Link
-            to="/members/add"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/members/add" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Tambah member
-          </Link>
-        </div>
+        <NavLink dataLink={dataLink} />
         <div className="w-full h-max p-2 px-4 bg-slate-100 rounded-lg mt-6">
           <h1 className="zain text-[1.3rem] text-indigo-600 font-semibold">
             Form Tambah Member

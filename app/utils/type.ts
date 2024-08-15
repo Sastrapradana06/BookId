@@ -7,7 +7,7 @@ export type UserContext = {
     email: string;
     wa: string;
     alamat: string;
-    tgl_lahir: Date | string;
+    tgl_lahir: string;
     jekel: string;
     role: string;
     status: string;

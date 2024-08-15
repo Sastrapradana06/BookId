@@ -11,6 +11,7 @@ import {
 import "./tailwind.css";
 import { json, LoaderFunction } from "@remix-run/node";
 import { getUser } from "./services/auth.server";
+import { MembersDB } from "./utils/type";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUser(request);
@@ -36,9 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { user } = useLoaderData<{
-    user: { id: string; name: string; role: string };
-  }>();
+  const { user } = useLoaderData<{ user: MembersDB }>();
   return <Outlet context={{ user }} />;
 }
 

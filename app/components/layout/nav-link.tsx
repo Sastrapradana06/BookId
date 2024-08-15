@@ -10,8 +10,8 @@ export default function NavLink({
 
   return (
     <div className="w-max flex items-center gap-1">
-      {dataLink.map((link) => (
-        <>
+      {dataLink.map((link, i) => (
+        <div key={i} className="flex items-center ">
           <Link
             to={link.link}
             className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
@@ -23,7 +23,7 @@ export default function NavLink({
             {link.name}
           </Link>
           <ChevronRight size={18} className="mt-[1px]" />
-        </>
+        </div>
       ))}
     </div>
   );

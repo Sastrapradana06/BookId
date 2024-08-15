@@ -30,6 +30,14 @@ export default defineConfig({
           route("api/delete-members", "routes/api/members/delete-members.tsx", {
             index: true,
           });
+
+          route(
+            "/api/update-profile",
+            "routes/api/profile/update-profile.tsx",
+            {
+              index: true,
+            }
+          );
         });
       },
     }),

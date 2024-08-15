@@ -53,6 +53,10 @@ export async function getDataById(db: string, id: number) {
 
     return { status: true, data };
   } catch (error: any) {
-    return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
+    return {
+      status: false,
+      error: { code: error.code || "UNKNOWN_ERROR" },
+      data: [],
+    };
   }
 }

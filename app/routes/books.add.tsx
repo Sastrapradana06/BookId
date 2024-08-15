@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MetaFunction } from "@remix-run/node";
-import { Link, useFetcher, useLocation, useNavigate } from "@remix-run/react";
+import { useFetcher, useNavigate } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import useHandleFile from "hooks/useHandleFile";
-import { ChevronRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 import Container from "~/components/layout/container";
+import NavLink from "~/components/layout/nav-link";
 import Alert from "~/components/ui/alert";
 import Input from "~/components/ui/input";
 import Label from "~/components/ui/label";
@@ -18,10 +18,20 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+const dataLink = [
+  {
+    name: "buku",
+    link: "/books",
+  },
+  {
+    name: "tambah buku",
+    link: "/books/add",
+  },
+];
+
 export default function AddBooks() {
   const fetcher = useFetcher<any>();
 
-  const { pathname } = useLocation();
   const navigate = useNavigate();
 
   const { urlImg, handleFile, reset } = useHandleFile();
@@ -82,25 +92,7 @@ export default function AddBooks() {
         />
       </>
       <section className="mt-1 lg:mt-0">
-        <div className="w-max flex items-center gap-1">
-          <Link
-            to="/books"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/books" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Buku
-          </Link>
-          <ChevronRight size={18} className="mt-[1px]" />
-          <Link
-            to="/books/add"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/books/add" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Tambah Buku
-          </Link>
-        </div>
+        <NavLink dataLink={dataLink} />
         <div className="w-full h-max p-2 px-4 bg-slate-100 rounded-lg mt-6">
           <h1 className="zain text-[1.3rem] text-indigo-600 font-semibold">
             Form Tambah Buku

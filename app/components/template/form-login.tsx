@@ -16,7 +16,7 @@ export default function FormLogin() {
   const fetcher = useFetcher<any>();
 
   const { data: dataInput, onChange } = useHandleInput({
-    email: "",
+    email: "sastra@gmail.com",
     password: "superadmin123",
   });
 

@@ -1,23 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import {
-  Link,
-  useFetcher,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-} from "@remix-run/react";
+import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
-import {
-  BookOpenText,
-  ChevronRight,
-  ScanEye,
-  Search,
-  Trash2,
-} from "lucide-react";
+import { BookOpenText, ScanEye, Search, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
+import NavLink from "~/components/layout/nav-link";
 import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
@@ -31,6 +20,17 @@ type LoaderData = {
     code: string;
   };
 };
+
+const dataLink = [
+  {
+    name: "buku",
+    link: "/books",
+  },
+  {
+    name: "tambah buku",
+    link: "/books/add",
+  },
+];
 
 export const meta: MetaFunction = () => {
   return [
@@ -70,7 +70,6 @@ export default function Books() {
   const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
   const [q, setQ] = useState<string>("");
 
-  const { pathname } = useLocation();
   const navigate = useNavigate();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
@@ -131,25 +130,7 @@ export default function Books() {
         />
       </>
       <section className="mt-1 lg:mt-0">
-        <div className="w-max flex items-center gap-1">
-          <Link
-            to="/books"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/books" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Buku
-          </Link>
-          <ChevronRight size={18} className="mt-[1px]" />
-          <Link
-            to="add"
-            className={`font-semibold text-[.8rem]  lg:text-[.9rem] ${
-              pathname === "/books/add" ? "text-gray-500" : "text-gray-400"
-            }`}
-          >
-            Tambah Buku
-          </Link>
-        </div>
+        <NavLink dataLink={dataLink} />
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
           <form
             className="flex items-center w-full lg:w-[40%]"

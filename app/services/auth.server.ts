@@ -2,13 +2,20 @@
 import { Authenticator } from "remix-auth";
 import { FormStrategy } from "remix-auth-form";
 import { sessionStorage } from "~/services/session.server";
-import { getuserByEmail } from "./supabase/fetch.server";
-import { comparePassword } from "~/utils/utils";
+import { getDataById, getuserByEmail } from "./supabase/fetch.server";
+import { comparePassword, hashPassword } from "~/utils/utils";
+import { updateDataDb } from "./supabase/update.server";
 
 interface User {
   id: string;
   name: string;
 }
+
+type GantiPasswordType = {
+  id: number;
+  password_lama: string;
+  password_baru: string;
+};
 
 const authenticator = new Authenticator<User>(sessionStorage);
 
@@ -51,6 +58,44 @@ export const handleLogin = async (email: string, password: string) => {
   };
 };
 
+export const gantiPasswordUser = async (data: GantiPasswordType) => {
+  const user = await getDataById("data members", data.id);
+
+  if (user.status === false || user.data.length === 0) {
+    return {
+      success: false,
+      message: "Tidak ditemukan user",
+    };
+  }
+
+  const validatePassword = comparePassword(
+    data.password_lama,
+    user.data[0].password
+  );
+
+  if (!validatePassword) {
+    return {
+      success: false,
+      message: "Periksa kembali password lama anda",
+    };
+  }
+
+  const updatePassword = await updateDataDb("data members", data.id, {
+    password: hashPassword(data.password_baru),
+  });
+
+  if (updatePassword.status === false)
+    return {
+      success: false,
+      message: "Gagal update password",
+    };
+
+  return {
+    success: true,
+    message: "Password Berhasil diubah",
+  };
+};
+
 async function getUser(request: Request) {
   const user = await authenticator.isAuthenticated(request);
   return user;
@@ -61,7 +106,7 @@ const isAuthUser = async (request: Request) => {
   if (!user) {
     return false;
   }
-  return true;
+  return user;
 };
 
 export { authenticator, getUser, isAuthUser };

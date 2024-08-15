@@ -5,7 +5,9 @@ export default function useHandleInput(initialValue: any) {
   const [data, setData] = useState(initialValue);
 
   const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     e.preventDefault();
     const { name, value } = e.target;
