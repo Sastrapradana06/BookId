@@ -5,6 +5,7 @@ interface InputProps {
   name: string;
   value?: string | number;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  readOnly?: boolean;
   placeholder?: string;
 }
 
@@ -15,6 +16,7 @@ export default function Input({
   name,
   value,
   onChange,
+  readOnly,
   placeholder,
 }: InputProps) {
   return (
@@ -24,6 +26,7 @@ export default function Input({
       name={name}
       value={value}
       onChange={onChange}
+      readOnly={readOnly}
       placeholder={placeholder}
       required
     />

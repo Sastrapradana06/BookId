@@ -84,7 +84,9 @@ export default function EditPassword() {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
         handleAlert("success", "Password Berhasil diubah");
-        navigate("/api/auth/logout");
+        setTimeout(() => {
+          navigate("/api/auth/logout");
+        }, 3000);
       } else {
         handleAlert("error", fetcher.data.message);
       }
