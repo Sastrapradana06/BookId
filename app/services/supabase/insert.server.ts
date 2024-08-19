@@ -14,6 +14,20 @@ import supabase from "~/lib/supabase";
 //   pengembalian?: number;
 // }
 
+export async function insertDataDb(db: string, data: any) {
+  try {
+    const { error } = await supabase.from(db).insert([data]);
+
+    if (error) {
+      throw error;
+    }
+
+    return { status: true, error: { code: 0 } };
+  } catch (error: any) {
+    return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
+  }
+}
+
 export async function insertBook(data: any) {
   try {
     const { error } = await supabase.from("data buku").insert([data]);

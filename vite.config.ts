@@ -32,6 +32,14 @@ export default defineConfig({
           });
 
           route(
+            "api/tambah-pinjaman",
+            "routes/api/pinjaman/tambah-pinjaman.tsx",
+            {
+              index: true,
+            }
+          );
+
+          route(
             "/api/update-profile",
             "routes/api/profile/update-profile.tsx",
             {

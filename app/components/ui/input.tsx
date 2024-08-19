@@ -1,7 +1,7 @@
 interface InputProps {
   size: "sm" | "md" | "lg" | "xl";
   color: "transparent" | "white" | "slate";
-  type: "text" | "password" | "email";
+  type: "text" | "password" | "email" | "date";
   name: string;
   value?: string | number;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;

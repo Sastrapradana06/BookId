@@ -42,3 +42,15 @@ export type MembersDB = {
   role: string;
   status: string;
 };
+
+export type PinjamanType = {
+  id: number;
+  created_at: Date | string;
+  nama_peminjam: string;
+  no_ktp: string;
+  id_buku: number;
+  nama_buku: string;
+  tgl_dipinjam: string;
+  tgl_pengembalian: Date | string;
+  id_member: number;
+};

@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
-import { BookOpenText, ScanEye, Search, Trash2 } from "lucide-react";
+import { ScanEye, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
 import NavLink from "~/components/layout/nav-link";
+import SearchInput from "~/components/layout/search-input";
 import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
@@ -68,9 +69,7 @@ export default function Books() {
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
   const [urlCoverBook, setUrlCoverBook] = useState<string[]>([]);
   const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
-  const [q, setQ] = useState<string>("");
 
-  const navigate = useNavigate();
   const fetcher = useFetcher<any>();
   const { data } = useLoaderData<LoaderData>();
 
@@ -93,12 +92,6 @@ export default function Books() {
     } else {
       setUrlCoverBook(urlCoverBook.filter((item) => item !== urlCover));
     }
-  };
-
-  const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log({ q });
-    navigate(`/books?q=${q}`);
   };
 
   useEffect(() => {
@@ -132,36 +125,7 @@ export default function Books() {
       <section className="mt-1 lg:mt-0">
         <NavLink dataLink={dataLink} />
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
-          <form
-            className="flex items-center w-full lg:w-[40%]"
-            onSubmit={handelFormSearch}
-          >
-            <label htmlFor="simple-search" className="sr-only">
-              Search
-            </label>
-            <div className="relative w-[90%] ">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-5 pointer-events-none">
-                <BookOpenText color="black" size={20} />
-              </div>
-              <input
-                type="text"
-                id="simple-search"
-                name="q"
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                className=" border bg-white shadow-lg border-gray-400 text-gray-900 text-sm rounded-3xl  block w-full ps-12 p-3.5 bg-transparent outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Cari buku"
-                required={true}
-              />
-            </div>
-            <button
-              type="submit"
-              className="p-3 ms-2 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-700 shadow-lg"
-            >
-              <Search color="white" size={20} />
-              <span className="sr-only">Search</span>
-            </button>
-          </form>
+          <SearchInput link="/books?q" placeholder="Cari Buku" />
           <div className="w-max h-max  flex items-center gap-2">
             {idAllDelete.length > 0 ? (
               <button
