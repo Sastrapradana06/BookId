@@ -38,6 +38,9 @@ export default defineConfig({
               index: true,
             }
           );
+          route("api/edit-pinjaman", "routes/api/pinjaman/edit-pinjaman.tsx", {
+            index: true,
+          });
 
           route(
             "/api/update-profile",

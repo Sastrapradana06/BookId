@@ -18,6 +18,7 @@ export async function insertDataDb(db: string, data: any) {
   try {
     const { error } = await supabase.from(db).insert([data]);
 
+    console.log({ error });
     if (error) {
       throw error;
     }

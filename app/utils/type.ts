@@ -49,8 +49,9 @@ export type PinjamanType = {
   nama_peminjam: string;
   no_ktp: string;
   id_buku: number;
-  nama_buku: string;
+  judul_buku: string;
   tgl_dipinjam: string;
   tgl_pengembalian: Date | string;
   id_member: number;
+  status: string;
 };

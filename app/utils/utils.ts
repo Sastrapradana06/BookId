@@ -32,6 +32,29 @@ export function getFormattedDate() {
   return `${tanggal} ${bulanNama} ${tahun}`;
 }
 
+export function formatTanggal(tanggal: string) {
+  const bulan = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul",
+    "Agu",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Des",
+  ];
+
+  const [tahun, bulanIndex, hari] = tanggal.split("-");
+
+  const namaBulan = bulan[parseInt(bulanIndex, 10) - 1];
+
+  return `${parseInt(hari, 10)} ${namaBulan} ${tahun}`;
+}
+
 export function getFirstLetters(name: string) {
   const words = name.split(" ");
   const firstLetters = words.map((word) => word.charAt(0));

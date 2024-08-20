@@ -1,11 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  ActionFunction,
-  json,
-  LoaderFunction,
-  MetaFunction,
-  redirect,
-} from "@remix-run/node";
+import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
 import {
   useFetcher,
   useLoaderData,
@@ -21,8 +15,7 @@ import Input from "~/components/ui/input";
 import Label from "~/components/ui/label";
 import Loading from "~/components/ui/loading";
 import { isAuthUser } from "~/services/auth.server";
-import { getDataById, getDataDb } from "~/services/supabase/fetch.server";
-import { insertDataDb } from "~/services/supabase/insert.server";
+import { getDataDb } from "~/services/supabase/fetch.server";
 import { UserContext } from "~/utils/type";
 
 const dataLink = [
@@ -49,46 +42,19 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/");
   }
 
+  console.log({ user });
+
   const getDataBuku = await getDataDb("data buku");
   if (getDataBuku.status === false) {
     return json({ success: false, message: "data buku tidak ditemukan" });
   }
 
-  return json({ success: true, data: getDataBuku.data });
-};
+  const dataBuku = getDataBuku.data;
+  const filteredDataBuku = dataBuku.filter((item: any) => {
+    return item.stok - item.terpinjam + item.pengembalian != 0;
+  });
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-
-  const data = {
-    nama_peminjam: formData.get("nama_peminjam") as string,
-    no_ktp: formData.get("no_ktp") as string,
-    tgl_dipinjam: formData.get("tgl_dipinjam") as string,
-    tgl_pengembalian: formData.get("tgl_pengembalian") as string,
-    id_buku: formData.get("id_buku") as string,
-    nama_buku: "",
-    id_member: formData.get("idMember") as string,
-  };
-
-  const getBuku = await getDataById("data buku", parseInt(data.id_buku));
-
-  if (getBuku.status === false) {
-    return json({ success: false, message: "data buku tidak ditemukan" });
-  }
-
-  const dataBuku = getBuku.data[0];
-  data.nama_buku = dataBuku.judul_buku;
-
-  const simpanData = await insertDataDb("data pinjaman", data);
-
-  if (simpanData.status === false) {
-    if (simpanData.error.code === "23505") {
-      return json({ success: false, message: "No KTP sudah terdaftar" });
-    }
-    return json({ success: false, message: "Data pinjaman gagal ditambahkan" });
-  }
-
-  return json({ success: true, message: "Data pinjaman berhasil ditambahkan" });
+  return json({ success: true, data: filteredDataBuku });
 };
 
 export default function TambahPinjaman() {
@@ -105,6 +71,7 @@ export default function TambahPinjaman() {
     fetcher.submit(formData, {
       method: "post",
       encType: "multipart/form-data",
+      action: "/api/tambah-pinjaman",
     });
   };
 
@@ -137,7 +104,7 @@ export default function TambahPinjaman() {
           </h1>
         </div>
         <div className="w-full h-max mt-1 py-2 px-4 bg-slate-100 rounded-lg">
-          <fetcher.Form
+          <form
             className="w-full h-max mt-4 flex flex-col gap-4"
             onSubmit={handleSubmit}
           >
@@ -209,7 +176,7 @@ export default function TambahPinjaman() {
                 Simpan
               </button>
             </div>
-          </fetcher.Form>
+          </form>
         </div>
       </section>
     </Container>

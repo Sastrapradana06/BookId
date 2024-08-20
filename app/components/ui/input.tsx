@@ -21,7 +21,7 @@ export default function Input({
 }: InputProps) {
   return (
     <input
-      className={`w-full rounded-lg  mt-2 outline-blue-500 ${sizeInput[size]} ${colorInput[color]}`}
+      className={`w-full rounded-lg  mt-2 outline-blue-500 read-only:bg-gray-200 read-only:outline-none ${sizeInput[size]} ${colorInput[color]}`}
       type={type}
       name={name}
       value={value}
