@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const dataBuku = getDataBuku.data;
   const filteredDataBuku = dataBuku.filter((item: any) => {
-    return item.stok - item.terpinjam + item.pengembalian != 0;
+    return item.stok - item.terpinjam != 0;
   });
 
   return json({ success: true, data: filteredDataBuku });
@@ -68,6 +68,8 @@ export default function TambahPinjaman() {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     formData.append("idMember", user.id.toString());
+    formData.append("nama_member", user.username.toString());
+
     fetcher.submit(formData, {
       method: "post",
       encType: "multipart/form-data",

@@ -14,6 +14,7 @@ export const action: ActionFunction = async ({ request }) => {
     id_buku: formData.get("id_buku") as string,
     judul_buku: "",
     id_member: formData.get("idMember") as string,
+    nama_member: formData.get("nama_member") as string,
   };
 
   const getBuku = await getDataById("data buku", parseInt(data.id_buku));
@@ -36,11 +37,7 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ success: false, message });
   }
 
-  const updateStok = await updateStokBook(
-    "pinjaman",
-    dataBuku.id,
-    dataBuku.terpinjam + 1
-  );
+  const updateStok = await updateStokBook(dataBuku.id, dataBuku.terpinjam + 1);
   console.log({ updateStok });
 
   return json({ success: true, message: "Data pinjaman berhasil ditambahkan" });

@@ -25,7 +25,6 @@ export type BookDB = {
   tahun_terbit: number;
   stok: number;
   terpinjam: number;
-  pengembalian: number;
   cover: string;
 };
 
@@ -53,5 +52,6 @@ export type PinjamanType = {
   tgl_dipinjam: string;
   tgl_pengembalian: Date | string;
   id_member: number;
+  nama_member: string;
   status: string;
 };

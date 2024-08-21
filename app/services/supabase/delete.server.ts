@@ -1,7 +1,19 @@
 import supabase from "~/lib/supabase";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export async function deleteDataDb(db: string, id: number) {
+  try {
+    const { error } = await supabase.from(db).delete().eq("id", id);
 
+    if (error) {
+      throw error;
+    }
+
+    return { status: true, message: "Data berhasil di hapus" };
+  } catch (error: any) {
+    return { status: false, message: error.code || "UNKNOWN_ERROR" };
+  }
+}
 // Delete Book
 export async function deleteBookId(id: number) {
   try {

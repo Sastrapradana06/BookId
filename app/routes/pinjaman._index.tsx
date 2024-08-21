@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { Check, Pencil } from "lucide-react";
-import { useState } from "react";
+import { useFetcher, useLoaderData, useOutletContext } from "@remix-run/react";
+import useHandleAlert from "hooks/useHandleAlert";
+import { Check, Pencil, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import Container from "~/components/layout/container";
+import ModalDelete from "~/components/layout/modal-delete";
 import NavLink from "~/components/layout/nav-link";
 import SearchInput from "~/components/layout/search-input";
 import FormEditPinjaman from "~/components/template/form-edit-pinjaman";
+import Alert from "~/components/ui/alert";
 
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import { PinjamanType } from "~/utils/type";
-import { formatTanggal } from "~/utils/utils";
+import { PinjamanType, UserContext } from "~/utils/type";
+import { formatTanggal, getFirstLetters } from "~/utils/utils";
 
 type LoaderDataPinjaman = {
   status: boolean;
@@ -37,7 +40,7 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await isAuthUser(request);
+  const user: any = await isAuthUser(request);
   if (!user) {
     return redirect("/");
   }
@@ -48,26 +51,72 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const dataPinjamanBuku = getData.data;
-  const filterByUser = dataPinjamanBuku.filter((item: any) => {
-    return item.id_member == user.id;
-  });
+  if (user.role !== "super admin" && user.role !== "admin") {
+    const filterByUser = dataPinjamanBuku.filter((item: any) => {
+      return item.id_member == user.id;
+    });
 
-  return json({ success: true, data: filterByUser });
+    return json({ success: true, data: filterByUser });
+  }
+  return json({ success: true, data: dataPinjamanBuku });
 };
 
 export default function PinjamanIdex() {
   const { data } = useLoaderData<LoaderDataPinjaman>();
+  const { user } = useOutletContext<UserContext>();
   const [isModalEdit, setIsModalEdit] = useState(false);
   const [dataEdit, editData] = useState<PinjamanType>();
-
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [dataDelete, setDataDelete] = useState<any>({});
+  const { status, data: dataAlert, handleAlert } = useHandleAlert();
+  const fetcher = useFetcher<any>();
   const handleEdit = (data: PinjamanType) => {
     editData(data);
     setIsModalEdit(true);
   };
 
+  const showDeleteModal = (id: number, idBuku: number, status: string) => {
+    setDataDelete({ id, idBuku, status });
+    setIsDeleteModal(true);
+  };
+
+  const deleteBukuTerpinjam = async () => {
+    setIsDeleteModal(false);
+    const formData = new FormData();
+    formData.append("id", dataDelete.id);
+    formData.append("idBuku", dataDelete.idBuku);
+    formData.append("status", dataDelete.status);
+
+    fetcher.submit(formData, {
+      method: "post",
+      action: "/api/delete-pinjaman",
+    });
+  };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      if (fetcher.data.success) {
+        handleAlert("success", "Pinjaman buku berhasil di hapus");
+      } else {
+        handleAlert("error", fetcher.data.message);
+      }
+    }
+  }, [fetcher.data, fetcher.state]);
+
   return (
     <Container>
       <>
+        <Alert
+          status={status}
+          type={dataAlert?.type}
+          message={dataAlert?.message}
+        />
+        <ModalDelete
+          type="pinjaman"
+          isModalOpen={isDeleteModal}
+          setIsModalOpen={setIsDeleteModal}
+          funcDelete={deleteBukuTerpinjam}
+        />
         {isModalEdit && (
           <FormEditPinjaman
             setIsModalEdit={setIsModalEdit}
@@ -111,6 +160,12 @@ export default function PinjamanIdex() {
                 <th scope="col" className="px-6 py-3 text-white">
                   Tgl Dikembalikan
                 </th>
+                {(user?.role == "super admin" || user?.role == "admin") && (
+                  <th scope="col" className="px-6 py-3 text-white">
+                    Member
+                  </th>
+                )}
+
                 <th scope="col" className="px-6 py-3 text-white">
                   Status
                 </th>
@@ -170,6 +225,17 @@ export default function PinjamanIdex() {
                   <td className="px-6 py-4">
                     {formatTanggal(item.tgl_pengembalian)}
                   </td>
+                  {(user?.role == "super admin" || user?.role == "admin") && (
+                    <td className="px-6 py-4">
+                      <button
+                        className="bg-amber-400 font-semibold uppercase p-2 rounded-md w-max text-white"
+                        title={item.nama_member}
+                      >
+                        {getFirstLetters(item.nama_member)}
+                      </button>
+                    </td>
+                  )}
+
                   <td className="px-6 py-4 capitalize">
                     <p
                       className={`font-semibold text-white p-2 text-[.8rem] rounded-md  ${
@@ -184,13 +250,12 @@ export default function PinjamanIdex() {
                     </p>
                   </td>
 
-                  <td className="">
-                    <div className="flex items-center gap-3 justify-center">
+                  <td className="p-1">
+                    <div className="flex items-center gap-2 justify-center">
                       <button
                         className="p-1 rounded-md bg-green-500"
                         name="button"
-                        title="Delete"
-                        // onClick={() => showDeleteModal(book.id, book.cover)}
+                        title="Dikembalikan"
                       >
                         <Check size={20} color="white" />
                       </button>
@@ -201,6 +266,16 @@ export default function PinjamanIdex() {
                         onClick={() => handleEdit(item)}
                       >
                         <Pencil size={20} color="white" />
+                      </button>
+                      <button
+                        className="p-1 rounded-md bg-red-500"
+                        name="button"
+                        title="delete"
+                        onClick={() =>
+                          showDeleteModal(item.id, item.id_buku, item.status)
+                        }
+                      >
+                        <Trash2 size={20} color="white" />
                       </button>
                     </div>
                   </td>

@@ -178,9 +178,7 @@ export default function Books() {
                 <th scope="col" className="px-6 py-3 text-white">
                   Terpinjam
                 </th>
-                <th scope="col" className="px-6 py-3 text-white">
-                  Pengembalian
-                </th>
+
                 <th scope="col" className="px-6 py-3 text-white">
                   Tahun Pengadaan
                 </th>
@@ -223,9 +221,9 @@ export default function Books() {
                   </th>
 
                   <td className="px-6 py-4">
-                    {book.stok - (book.terpinjam + book.pengembalian) > 0 ? (
+                    {book.stok - book.terpinjam > 0 ? (
                       <p className="capitalize font-semibold text-green-500">
-                        {book.stok - (book.terpinjam + book.pengembalian)}
+                        {book.stok - book.terpinjam}
                       </p>
                     ) : (
                       <p className="capitalize font-semibold text-red-500">
@@ -235,7 +233,6 @@ export default function Books() {
                   </td>
                   <td className="px-6 py-4">{book.stok}</td>
                   <td className="px-6 py-4">{book.terpinjam}</td>
-                  <td className="px-6 py-4">{book.pengembalian}</td>
                   <td className="px-6 py-4">{formatDate(book.created_at)}</td>
 
                   <td className="">

@@ -1,5 +1,4 @@
 import {
-  BookDown,
   BookOpenText,
   BookUp,
   CircleUserRound,
@@ -30,11 +29,6 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
           <ListLink link="/books" text="books" icon={<BookOpenText />} />
           <ListLink link="/members" text="members" icon={<CircleUserRound />} />
           <ListLink link="/pinjaman" text="pinjaman" icon={<BookUp />} />
-          <ListLink
-            link="/pengembalian"
-            text="pengembalian"
-            icon={<BookDown />}
-          />
 
           <ListLink link="/profile" text="profile" icon={<UserCog />} />
 

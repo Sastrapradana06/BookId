@@ -58,33 +58,16 @@ export const updateRoleMembers = async (id: number, newRole: string) => {
   }
 };
 
-export const updateStokBook = async (
-  type: string,
-  id: number,
-  jumlah: number
-) => {
-  console.log({ type, id, jumlah });
-
+export const updateStokBook = async (id: number, jumlah: number) => {
   try {
-    if (type == "pinjaman") {
-      const { error } = await supabase
-        .from("data buku")
-        .update({ terpinjam: jumlah })
-        .eq("id", id);
-      if (error) {
-        throw error;
-      }
-      return { status: true, message: "Terpinjam diperbarui" };
-    }
-
     const { error } = await supabase
       .from("data buku")
-      .update({ pengembalian: jumlah })
+      .update({ terpinjam: jumlah })
       .eq("id", id);
     if (error) {
       throw error;
     }
-    return { status: true, message: "Pengembalian diperbarui" };
+    return { status: true, message: "Stok diperbarui" };
   } catch (error: any) {
     return { status: false, message: error.code || "UNKNOWN_ERROR" };
   }
