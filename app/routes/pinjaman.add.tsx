@@ -42,8 +42,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/");
   }
 
-  console.log({ user });
-
   const getDataBuku = await getDataDb("data buku");
   if (getDataBuku.status === false) {
     return json({ success: false, message: "data buku tidak ditemukan" });
@@ -66,6 +64,10 @@ export default function TambahPinjaman() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (user.status == "non-aktif") {
+      handleAlert("info", "Akun anda sedang dinonaktifkan");
+      return false;
+    }
     const formData = new FormData(event.currentTarget);
     formData.append("idMember", user.id.toString());
     formData.append("nama_member", user.username.toString());
@@ -80,7 +82,7 @@ export default function TambahPinjaman() {
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
-        handleAlert("success", "Member baru berhasil ditambahkan");
+        handleAlert("success", "Pinjaman berhasil ditambahkan");
         navigate("/pinjaman");
       } else {
         handleAlert("error", fetcher.data.message);
@@ -134,6 +136,16 @@ export default function TambahPinjaman() {
             </div>
             <div className="w-full h-max flex flex-col justify-center gap-3 lg:flex-row borde-r">
               <div className="w-full ">
+                <Label htmlFor="no_wa" teks="No WA" />
+                <Input
+                  size="sm"
+                  color="transparent"
+                  type="text"
+                  name="no_wa"
+                  placeholder="No wa peminjam"
+                />
+              </div>
+              <div className="w-full ">
                 <Label htmlFor="id_buku" teks="Nama buku" />
                 <select
                   id="id_buku"
@@ -147,6 +159,8 @@ export default function TambahPinjaman() {
                   ))}
                 </select>
               </div>
+            </div>
+            <div className="w-full h-max flex flex-col  gap-2 lg:flex-row borde-r">
               <div className="w-full">
                 <Label htmlFor="tgl_dipinjam" teks="Tanggal Dipinjam" />
                 <Input
@@ -157,9 +171,7 @@ export default function TambahPinjaman() {
                   placeholder="Pilih tanggal dipinjam"
                 />
               </div>
-            </div>
-            <div className="w-full h-max flex flex-col  gap-2 lg:flex-row borde-r">
-              <div className="w-full lg:w-[50%]">
+              <div className="w-full ">
                 <Label htmlFor="tgl_pengembalian" teks="Tanggal Pengembalian" />
                 <Input
                   size="sm"

@@ -72,3 +72,18 @@ export const updateStokBook = async (id: number, jumlah: number) => {
     return { status: false, message: error.code || "UNKNOWN_ERROR" };
   }
 };
+
+export const updateStatusPinjaman = async (id: number, status: string) => {
+  try {
+    const { error } = await supabase
+      .from("data pinjaman")
+      .update({ status })
+      .eq("id", id);
+    if (error) {
+      throw error;
+    }
+    return { status: true, message: "Status pinjaman berhasil diperbarui" };
+  } catch (error: any) {
+    return { status: false, message: error.code || "UNKNOWN_ERROR" };
+  }
+};

@@ -7,6 +7,7 @@ export const action: ActionFunction = async ({ request }) => {
   const dataUpdate = {
     nama_peminjam: formData.get("nama_peminjam") as string,
     no_ktp: formData.get("no_ktp") as string,
+    no_wa: formData.get("no_wa") as string,
     tgl_dipinjam: formData.get("tgl_dipinjam") as string,
     tgl_pengembalian: formData.get("tgl_pengembalian") as string,
   };

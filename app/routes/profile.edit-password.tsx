@@ -53,8 +53,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     password_baru,
   });
 
-  console.log({ result });
-
   return json({ success: result.success, message: result.message });
 };
 

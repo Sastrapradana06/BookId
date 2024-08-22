@@ -10,6 +10,7 @@ import NavLink from "~/components/layout/nav-link";
 import SearchInput from "~/components/layout/search-input";
 import FormEditPinjaman from "~/components/template/form-edit-pinjaman";
 import Alert from "~/components/ui/alert";
+import Loading from "~/components/ui/loading";
 
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
@@ -93,10 +94,26 @@ export default function PinjamanIdex() {
     });
   };
 
+  const handleDikembalikan = async (
+    id: number,
+    idBuku: number,
+    status: string
+  ) => {
+    const formData = new FormData();
+    formData.append("id", id.toString());
+    formData.append("idBuku", idBuku.toString());
+    formData.append("status", status);
+    fetcher.submit(formData, {
+      method: "post",
+      encType: "multipart/form-data",
+      action: "/api/pinjaman-dikembalikan",
+    });
+  };
+
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
-        handleAlert("success", "Pinjaman buku berhasil di hapus");
+        handleAlert("success", fetcher.data.message);
       } else {
         handleAlert("error", fetcher.data.message);
       }
@@ -106,6 +123,7 @@ export default function PinjamanIdex() {
   return (
     <Container>
       <>
+        <Loading status={fetcher.state !== "idle"} />
         <Alert
           status={status}
           type={dataAlert?.type}
@@ -153,6 +171,9 @@ export default function PinjamanIdex() {
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
                   No KTP
+                </th>
+                <th scope="col" className="px-6 py-3 text-white">
+                  No Wa
                 </th>
                 <th scope="col" className="px-6 py-3 text-white">
                   Tgl Dipinjam
@@ -219,6 +240,8 @@ export default function PinjamanIdex() {
                     </p>
                   </th>
                   <td className="px-6 py-4">{item.no_ktp}</td>
+                  <td className="px-6 py-4">{item.no_wa}</td>
+
                   <td className="px-6 py-4">
                     {formatTanggal(item.tgl_dipinjam)}
                   </td>
@@ -236,9 +259,9 @@ export default function PinjamanIdex() {
                     </td>
                   )}
 
-                  <td className="px-6 py-4 capitalize">
+                  <td className="px-6 py-4 capitalize ">
                     <p
-                      className={`font-semibold text-white p-2 text-[.8rem] rounded-md  ${
+                      className={`font-semibold text-white p-2 text-[.8rem] rounded-md text-center   ${
                         item.status === "terpinjam"
                           ? " bg-blue-500"
                           : item.status === "dikembalikan"
@@ -253,9 +276,19 @@ export default function PinjamanIdex() {
                   <td className="p-1">
                     <div className="flex items-center gap-2 justify-center">
                       <button
-                        className="p-1 rounded-md bg-green-500"
+                        className={`p-1 rounded-md bg-green-500 disabled:bg-gray-300 ${
+                          item.status == "dikembalikan" && "cursor-not-allowed"
+                        }`}
                         name="button"
                         title="Dikembalikan"
+                        disabled={item.status == "dikembalikan" ? true : false}
+                        onClick={() =>
+                          handleDikembalikan(
+                            item.id,
+                            item.id_buku,
+                            "dikembalikan"
+                          )
+                        }
                       >
                         <Check size={20} color="white" />
                       </button>

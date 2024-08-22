@@ -48,6 +48,13 @@ export default defineConfig({
               index: true,
             }
           );
+          route(
+            "api/pinjaman-dikembalikan",
+            "routes/api/pinjaman/dikembalikan.tsx",
+            {
+              index: true,
+            }
+          );
 
           route(
             "/api/update-profile",

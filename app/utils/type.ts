@@ -47,6 +47,7 @@ export type PinjamanType = {
   created_at: Date | string;
   nama_peminjam: string;
   no_ktp: string;
+  no_wa: string;
   id_buku: number;
   judul_buku: string;
   tgl_dipinjam: string;

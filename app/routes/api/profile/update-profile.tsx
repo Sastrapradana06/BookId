@@ -19,7 +19,6 @@ export const action: ActionFunction = async ({ request }) => {
     const imgUpdate = formData.get("img_update");
     const imgLama = formData.get("foto_profil") as string;
     const idMembers = formData.get("idMembers");
-    console.log({ idMembers });
 
     if (imgLama != "/pp-cewek.jpeg" && imgLama != "/pp-cowok.jpeg") {
       const urls = extractFilePath(imgLama);

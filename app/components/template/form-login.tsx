@@ -33,7 +33,6 @@ export default function FormLogin() {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success === false) {
         handleAlert("error", fetcher.data.message);
-        console.log("gagal");
         fetcher.data = null;
       }
     }

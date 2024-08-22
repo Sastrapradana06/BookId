@@ -1,4 +1,5 @@
-import { useOutletContext } from "@remix-run/react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useLoaderData, useOutletContext } from "@remix-run/react";
 import { BookOpenText, BookUp, Layers3, Users } from "lucide-react";
 import CardNew from "~/components/layout/card- new";
 import CardInfo from "~/components/layout/card-info";
@@ -7,6 +8,7 @@ import Container from "~/components/layout/container";
 import { UserContext } from "~/utils/type";
 import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { isAuthUser } from "~/services/auth.server";
+import { getDataDb } from "~/services/supabase/fetch.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await isAuthUser(request);
@@ -14,11 +16,27 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/");
   }
 
-  return json({ user });
+  const getBuku = await getDataDb("data buku");
+  const getPinjaman = await getDataDb("data pinjaman");
+  const getMember = await getDataDb("data members");
+
+  const totalBuku = getBuku.data.length;
+  const totalPinjaman = getPinjaman.data.filter((item: any) => {
+    return item.status == "terpinjam";
+  });
+  const totalMember = getMember.data.length;
+
+  return json({
+    user,
+    totalBuku,
+    totalPinjaman: totalPinjaman.length,
+    totalMember,
+  });
 };
 
 export default function Dashboard() {
   const { user } = useOutletContext<UserContext>();
+  const { totalBuku, totalPinjaman, totalMember } = useLoaderData<any>();
 
   const latestBooks = [
     {
@@ -111,25 +129,25 @@ export default function Dashboard() {
           <div className="w-full flex flex-wrap gap-3 items-center  mt-3  justify-between lg:gap-0">
             <CardInfo
               icons={<BookOpenText color="white" />}
-              total={150}
+              total={totalBuku}
               text="Jumlah buku"
               bgColor="bg-green-500"
             />
             <CardInfo
               icons={<Layers3 color="white" />}
-              total={60}
+              total={5}
               text="Jenis buku"
               bgColor="bg-amber-400"
             />
             <CardInfo
               icons={<BookUp color="white" />}
-              total={92}
+              total={totalPinjaman}
               text="Buku Dipinjam"
               bgColor="bg-pink-600"
             />
             <CardInfo
               icons={<Users color="white" />}
-              total={6}
+              total={totalMember}
               text="Anggota"
               bgColor="bg-sky-600"
             />

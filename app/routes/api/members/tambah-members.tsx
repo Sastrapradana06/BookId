@@ -28,8 +28,6 @@ export const action: ActionFunction = async ({ request }) => {
       password: generatePassword(formData.get("role") as string),
     };
 
-    console.log(dataForm.jekel);
-
     if (imgProfil && imgProfil instanceof File) {
       if (imgProfil.size != 0 && imgProfil.name != "") {
         const upload = await uploadImgProfile(imgProfil);

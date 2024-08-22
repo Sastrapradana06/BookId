@@ -9,6 +9,7 @@ export const action: ActionFunction = async ({ request }) => {
   const data = {
     nama_peminjam: formData.get("nama_peminjam") as string,
     no_ktp: formData.get("no_ktp") as string,
+    no_wa: formData.get("no_wa") as string,
     tgl_dipinjam: formData.get("tgl_dipinjam") as string,
     tgl_pengembalian: formData.get("tgl_pengembalian") as string,
     id_buku: formData.get("id_buku") as string,
@@ -27,7 +28,6 @@ export const action: ActionFunction = async ({ request }) => {
   data.judul_buku = dataBuku.judul_buku;
 
   const simpanData = await insertDataDb("data pinjaman", data);
-  console.log({ simpanData });
 
   if (simpanData.status === false) {
     const message =
@@ -38,7 +38,10 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   const updateStok = await updateStokBook(dataBuku.id, dataBuku.terpinjam + 1);
-  console.log({ updateStok });
+
+  if (updateStok.status === false) {
+    return json({ success: false, message: "terjadi kesalahan" });
+  }
 
   return json({ success: true, message: "Data pinjaman berhasil ditambahkan" });
 };

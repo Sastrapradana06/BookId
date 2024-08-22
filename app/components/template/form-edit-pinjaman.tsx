@@ -32,7 +32,7 @@ export default function FormEditPinjaman({
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
-        handleAlert("success", "Data berhasilar diubah");
+        handleAlert("success", "Data pinjaman berhasil diubah");
         setTimeout(() => {
           setIsModalEdit(false);
           reset();
@@ -86,6 +86,18 @@ export default function FormEditPinjaman({
           </div>
           <div className="w-full h-max flex flex-col justify-center gap-3 lg:flex-row borde-r">
             <div className="w-full ">
+              <Label htmlFor="no_wa" teks="No Wa" />
+              <Input
+                size="sm"
+                color="transparent"
+                type="text"
+                name="no_wa"
+                value={input?.no_wa}
+                onChange={onChange}
+                placeholder="No Wa"
+              />
+            </div>
+            <div className="w-full ">
               <Label htmlFor="judul_buku" teks="Judul buku" />
               <Input
                 size="sm"
@@ -98,6 +110,8 @@ export default function FormEditPinjaman({
                 readOnly
               />
             </div>
+          </div>
+          <div className="w-full h-max flex flex-col  gap-2 lg:flex-row borde-r">
             <div className="w-full">
               <Label htmlFor="tgl_dipinjam" teks="Tanggal Dipinjam" />
               <Input
@@ -110,9 +124,7 @@ export default function FormEditPinjaman({
                 placeholder="Pilih tanggal dipinjam"
               />
             </div>
-          </div>
-          <div className="w-full h-max flex flex-col  gap-2 lg:flex-row borde-r">
-            <div className="w-full lg:w-[50%]">
+            <div className="w-full">
               <Label htmlFor="tgl_pengembalian" teks="Tanggal Pengembalian" />
               <Input
                 size="sm"

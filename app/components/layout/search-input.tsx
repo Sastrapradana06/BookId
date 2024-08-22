@@ -13,8 +13,6 @@ export default function SearchInput({
   const navigate = useNavigate();
   const handelFormSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log({ q });
-    // navigate(`/books?q=${q}`);
     navigate(`${link}=${q}`);
   };
 

@@ -7,23 +7,22 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const id = formData.get("id") as string;
   const idBuku = formData.get("idBuku") as string;
-  const status = formData.get("status") as string;
+  const statusPinjaman = formData.get("status") as string;
 
-  console.log({ status });
+  if (statusPinjaman == "terpinjam") {
+    const getBook = await getDataById("data buku", parseInt(idBuku));
+    if (getBook.status === false) {
+      return json({ success: false, message: "terjadi kesalahan" });
+    }
+    const dataBuku = getBook.data[0];
 
-  const getBook = await getDataById("data buku", parseInt(idBuku));
-  if (getBook.status === false) {
-    return json({ success: false, message: "terjadi kesalahan" });
-  }
-  const dataBuku = getBook.data[0];
-  console.log({ dataBuku });
-
-  const updateStokBuku = await updateStokBook(
-    parseInt(idBuku),
-    parseInt(dataBuku.terpinjam) - 1
-  );
-  if (updateStokBuku.status === false) {
-    return json({ success: false, message: "terjadi kesalahan" });
+    const updateStokBuku = await updateStokBook(
+      parseInt(idBuku),
+      parseInt(dataBuku.terpinjam) - 1
+    );
+    if (updateStokBuku.status === false) {
+      return json({ success: false, message: "terjadi kesalahan" });
+    }
   }
 
   const deletePinjaman = await deleteDataDb("data pinjaman", parseInt(id));
@@ -31,7 +30,7 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ success: false, message: "terjadi kesalahan" });
   }
 
-  return json({ success: true, message: "data pinjaman berhasil di hapus" });
+  return json({ success: true, message: "Pinjaman buku berhasil di hapus" });
 };
 
 export default function ApiDeletePinjaman() {
