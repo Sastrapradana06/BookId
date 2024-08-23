@@ -222,17 +222,19 @@ export default function Books() {
 
                   <td className="px-6 py-4">
                     {book.stok - book.terpinjam > 0 ? (
-                      <p className="capitalize font-semibold text-green-500">
+                      <p className="capitalize font-semibold text-blue-400">
                         {book.stok - book.terpinjam}
                       </p>
                     ) : (
-                      <p className="capitalize font-semibold text-red-500">
+                      <p className="capitalize font-semibold text-red-500 animate-pulse">
                         0{" "}
                       </p>
                     )}
                   </td>
                   <td className="px-6 py-4">{book.stok}</td>
-                  <td className="px-6 py-4">{book.terpinjam}</td>
+                  <td className="px-6 py-4 font-semibold text-green-500">
+                    {book.terpinjam}
+                  </td>
                   <td className="px-6 py-4">{formatDate(book.created_at)}</td>
 
                   <td className="">

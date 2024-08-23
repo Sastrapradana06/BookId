@@ -9,6 +9,7 @@ import { UserContext } from "~/utils/type";
 import { json, LoaderFunction, redirect } from "@remix-run/node";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
+import { formatDate } from "~/utils/utils";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await isAuthUser(request);
@@ -16,93 +17,35 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect("/");
   }
 
-  const getBuku = await getDataDb("data buku");
-  const getPinjaman = await getDataDb("data pinjaman");
-  const getMember = await getDataDb("data members");
+  const dataBuku = await getDataDb("data buku");
+  const dataPinjamanBuku = await getDataDb("data pinjaman");
+  const dataMember = await getDataDb("data members");
 
-  const totalBuku = getBuku.data.length;
-  const totalPinjaman = getPinjaman.data.filter((item: any) => {
+  const totalPinjaman = dataPinjamanBuku.data.filter((item: any) => {
     return item.status == "terpinjam";
   });
-  const totalMember = getMember.data.length;
+
+  const popularBooks = dataBuku.data
+    .sort((a, b) => b.terpinjam - a.terpinjam)
+    .slice(0, 3)
+    .filter((item) => item.terpinjam != 0);
+
+  const latestBooks = dataBuku.data.sort((a, b) => b.id - a.id).slice(0, 3);
 
   return json({
     user,
-    totalBuku,
+    totalBuku: dataBuku.data.length,
     totalPinjaman: totalPinjaman.length,
-    totalMember,
+    totalMember: dataMember.data.length,
+    popularBooks,
+    latestBooks,
   });
 };
 
 export default function Dashboard() {
   const { user } = useOutletContext<UserContext>();
-  const { totalBuku, totalPinjaman, totalMember } = useLoaderData<any>();
-
-  const latestBooks = [
-    {
-      id: 1,
-      cover: "/Laskar Pelangi.jpeg",
-      title: "Laskar Pelangi",
-      author: "Andrea Hirata",
-      release: "23 agustus 2020",
-      page: 12,
-    },
-    {
-      id: 2,
-      cover: "/Read of the Day!.jpeg",
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      release: "2 Maret 2007",
-      page: 10,
-    },
-    {
-      id: 3,
-      cover: "/Negeri 5 Menara.jpeg",
-      title: "Negeri 5 Menara",
-      author: "Ahmad Fuadi",
-      release: "10 Januari 2022",
-      page: 23,
-    },
-  ];
-
-  const popularBooks = [
-    {
-      id: 1,
-      cover: "/Atomic Habits.jpeg",
-      title: "Atomic Habits",
-      author: "Andrea Hirata",
-      release: "5 april 2018",
-      page: 123,
-      dipinjam: 150,
-    },
-    {
-      id: 2,
-      cover: "/Ayat-Ayat Cinta.jpeg",
-      title: "Ayat-Ayat Cinta",
-      author: "Habiburrahman El Shirazy",
-      release: "2004",
-      page: 95,
-      dipinjam: 125,
-    },
-    {
-      id: 3,
-      cover: "/Sang Pemimpi.jpeg",
-      title: "Sang Pemimpi",
-      author: "Andrea Hirata",
-      release: "2006",
-      page: 76,
-      dipinjam: 97,
-    },
-    {
-      id: 4,
-      cover: "/To Kill a Mockingbird.jpeg",
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      release: "1960",
-      page: 51,
-      dipinjam: 73,
-    },
-  ];
+  const { totalBuku, totalPinjaman, totalMember, popularBooks, latestBooks } =
+    useLoaderData<any>();
 
   return (
     <Container>
@@ -159,14 +102,14 @@ export default function Dashboard() {
           </p>
           <div className="w-full h-max  overflow-x-scroll flex gap-4">
             <div className="min-w-max flex gap-4">
-              {latestBooks.map((book) => (
+              {latestBooks.map((book: any) => (
                 <CardNew
                   key={book.id}
                   cover={book.cover}
-                  title={book.title}
-                  author={book.author}
-                  date={book.release}
-                  halaman={book.page}
+                  title={book.judul_buku}
+                  author={book.penulis}
+                  date={formatDate(book.created_at)}
+                  halaman={book.pages}
                 />
               ))}
             </div>
@@ -178,11 +121,11 @@ export default function Dashboard() {
           </p>
           <div className="w-full h-max  overflow-x-scroll flex gap-4">
             <div className="min-w-max flex gap-4 lg:gap-6">
-              {popularBooks.map((book) => (
+              {popularBooks.map((book: any) => (
                 <CardPopular
                   key={book.id}
                   cover={book.cover}
-                  terpinjam={book.dipinjam}
+                  terpinjam={book.terpinjam}
                 />
               ))}
             </div>

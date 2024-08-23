@@ -1,7 +1,7 @@
 import { Mail, SquareMenu } from "lucide-react";
 import Sidebar from "./sidebar";
 import { useState } from "react";
-import { useOutletContext } from "@remix-run/react";
+import { Link, useOutletContext } from "@remix-run/react";
 import { UserContext } from "~/utils/type";
 import { getDay, getFormattedDate } from "~/utils/utils";
 
@@ -35,7 +35,9 @@ export default function Navbar() {
             </p>
           </div>
           <div className="w-max h-max flex items-center gap-4 lg:gap-6">
-            <Mail size={25} color="gray" />
+            <Link to="/notifikasi" className="cursor-pointer">
+              <Mail size={25} color="gray" />
+            </Link>
             <img
               src={user.foto_profil}
               alt="avatar"

@@ -27,6 +27,13 @@ export const action: ActionFunction = async ({ request }) => {
   const dataBuku = getBuku.data[0];
   data.judul_buku = dataBuku.judul_buku;
 
+  if (dataBuku.terpinjam >= dataBuku.stok) {
+    return json({
+      success: false,
+      message: `Stok buku ${dataBuku.judul_buku} habis`,
+    });
+  }
+
   const simpanData = await insertDataDb("data pinjaman", data);
 
   if (simpanData.status === false) {
