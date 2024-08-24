@@ -6,7 +6,7 @@ export async function getDataDb(db: string) {
     const { data, error } = await supabase
       .from(db)
       .select()
-      .order("id", { ascending: true });
+      .order("id", { ascending: false });
 
     if (error) {
       throw error;

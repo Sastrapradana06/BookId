@@ -42,6 +42,14 @@ export type MembersDB = {
   status: string;
 };
 
+export type NotifDB = {
+  id: number;
+  created_at: Date | string;
+  status: string;
+  judul_buku: string;
+  nama_peminjam: string | null;
+};
+
 export type PinjamanType = {
   id: number;
   created_at: Date | string;

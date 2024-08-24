@@ -35,8 +35,9 @@ export default function Navbar() {
             </p>
           </div>
           <div className="w-max h-max flex items-center gap-4 lg:gap-6">
-            <Link to="/notifikasi" className="cursor-pointer">
+            <Link to="/notifikasi" className="cursor-pointer  p-1 relative">
               <Mail size={25} color="gray" />
+              <div className="w-[10px] h-[10px] bg-red-500 rounded-full absolute top-0 right-0"></div>
             </Link>
             <img
               src={user.foto_profil}

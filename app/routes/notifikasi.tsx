@@ -1,6 +1,24 @@
-import { MetaFunction } from "@remix-run/node";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  MetaFunction,
+  redirect,
+} from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import CardNotif from "~/components/layout/card-notif";
 import Container from "~/components/layout/container";
+import { isAuthUser } from "~/services/auth.server";
+import { deleteDataById } from "~/services/supabase/delete.server";
+import { getDataDb } from "~/services/supabase/fetch.server";
+import { MembersDB, NotifDB } from "~/utils/type";
+
+type LoaderDataType = {
+  status: boolean;
+  user?: MembersDB[];
+  dataNotif?: NotifDB[];
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,20 +27,26 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const id = formData.get("idNotif") as string;
+  const deleteNotif = await deleteDataById("data notif", parseInt(id));
+  return json({ success: deleteNotif.status });
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user: any = await isAuthUser(request);
+  if (!user) {
+    return redirect("/");
+  }
+
+  const getDataNotif = await getDataDb("data notif");
+
+  return json({ status: true, dataNotif: getDataNotif.data, user });
+};
+
 export default function Notifikasi() {
-  const dataNotif = [
-    {
-      status: "ketersediaan",
-      judul_buku: "Atomic Habits",
-      date: "22 Ags 2022",
-    },
-    {
-      status: "keterlambatan",
-      judul_buku: "Laskar Pelangi",
-      date: "20 Ags 2022",
-      nama_peminjam: "Zainal Abidin",
-    },
-  ];
+  const { dataNotif } = useLoaderData<LoaderDataType>();
 
   return (
     <Container>
@@ -30,8 +54,18 @@ export default function Notifikasi() {
         Notifikasi
       </h1>
       <div className="w-full min-h-max max-h-[600px] overflow-auto mt-3  rounded-md bg-slate-100 px-2 py-4 flex flex-col gap-4">
-        {dataNotif.map((data, i) => (
-          <CardNotif {...data} key={i} />
+        {dataNotif?.length === 0 && (
+          <p className="text-center">Tidak ada notifikasi</p>
+        )}
+        {dataNotif?.map((data, i) => (
+          <CardNotif
+            key={i}
+            id={data.id}
+            status={data.status}
+            created_at={data.created_at}
+            judul_buku={data.judul_buku}
+            nama_peminjam={data.nama_peminjam}
+          />
         ))}
       </div>
     </Container>

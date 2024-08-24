@@ -3,6 +3,43 @@ import { getDataById } from "~/services/supabase/fetch.server";
 import { insertDataDb } from "~/services/supabase/insert.server";
 import { updateStokBook } from "~/services/supabase/update.server";
 
+// const filterKetersediaanBuku = async () => {
+//   const getData = await getDataDb("data buku");
+//   if (getData.status === false) return;
+//   const dataBuku = getData.data;
+//   console.log({ dataBuku });
+
+//   const data = dataBuku.filter((item) => {
+//     return item.stok - item.terpinjam == 0;
+//   });
+
+//   if (data.length !== 0) {
+//     const datadb: { judul_buku: string }[] = data.map((item) => ({
+//       status: "ketersediaan",
+//       judul_buku: item.judul_buku,
+//     }));
+
+//     console.log({ datadb });
+
+//     const insertDataNotif = await insertMultipleDataDb("data notif", datadb);
+
+//     console.log({ insertDataNotif });
+//   }
+// };
+
+const notifKetersediaanBuku = async (id: number) => {
+  const getData = await getDataById("data buku", id);
+  const dataBuku = getData.data[0];
+
+  if (dataBuku.terpinjam == dataBuku.stok) {
+    const insertDataNotif = await insertDataDb("data notif", {
+      status: "ketersediaan",
+      judul_buku: dataBuku.judul_buku,
+    });
+
+    console.log({ insertDataNotif });
+  }
+};
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
@@ -44,11 +81,8 @@ export const action: ActionFunction = async ({ request }) => {
     return json({ success: false, message });
   }
 
-  const updateStok = await updateStokBook(dataBuku.id, dataBuku.terpinjam + 1);
-
-  if (updateStok.status === false) {
-    return json({ success: false, message: "terjadi kesalahan" });
-  }
+  await updateStokBook(dataBuku.id, dataBuku.terpinjam + 1);
+  await notifKetersediaanBuku(parseInt(data.id_buku));
 
   return json({ success: true, message: "Data pinjaman berhasil ditambahkan" });
 };

@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { json, LoaderFunction, MetaFunction, redirect } from "@remix-run/node";
-import { useFetcher, useLoaderData, useOutletContext } from "@remix-run/react";
+import {
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+  useOutletContext,
+} from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import { Check, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,12 +19,13 @@ import Loading from "~/components/ui/loading";
 
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import { PinjamanType, UserContext } from "~/utils/type";
+import { MembersDB, PinjamanType, UserContext } from "~/utils/type";
 import { formatTanggal, getFirstLetters } from "~/utils/utils";
 
 type LoaderDataPinjaman = {
   status: boolean;
-  data?: PinjamanType[];
+  dataPinjaman?: PinjamanType[];
+  dataMember?: MembersDB[];
 };
 
 const dataLink = [
@@ -45,25 +51,48 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!user) {
     return redirect("/");
   }
+  const url = new URL(request.url);
+  const filterMember = url.searchParams.get("member");
 
   const getData = await getDataDb("data pinjaman");
+
   if (getData.status === false) {
     return json({ success: false, message: "data pinjaman tidak ditemukan" });
   }
 
-  const dataPinjamanBuku = getData.data;
-  if (user.role !== "super admin" && user.role !== "admin") {
-    const filterByUser = dataPinjamanBuku.filter((item: any) => {
-      return item.id_member == user.id;
-    });
+  let dataPinjamanBuku = getData.data;
 
-    return json({ success: true, data: filterByUser });
+  // filter ketersediaan buku
+
+  if (filterMember) {
+    const filterByMember = dataPinjamanBuku.filter((item: any) => {
+      return item.id_member == filterMember;
+    });
+    dataPinjamanBuku = filterByMember;
+  } else {
+    if (user.role !== "super admin" && user.role !== "admin") {
+      const filterByUser = dataPinjamanBuku.filter((item: any) => {
+        return item.id_member == user.id;
+      });
+
+      dataPinjamanBuku = filterByUser;
+    }
   }
-  return json({ success: true, data: dataPinjamanBuku });
+
+  const getDataMember = await getDataDb("data members");
+  const filterDataMember = getDataMember.data.filter((item: any) => {
+    return item.role !== "super admin" && item.role !== "admin";
+  });
+
+  return json({
+    success: true,
+    dataPinjaman: dataPinjamanBuku,
+    dataMember: filterDataMember,
+  });
 };
 
 export default function PinjamanIdex() {
-  const { data } = useLoaderData<LoaderDataPinjaman>();
+  const { dataPinjaman, dataMember } = useLoaderData<LoaderDataPinjaman>();
   const { user } = useOutletContext<UserContext>();
   const [isModalEdit, setIsModalEdit] = useState(false);
   const [dataEdit, editData] = useState<PinjamanType>();
@@ -71,6 +100,7 @@ export default function PinjamanIdex() {
   const [dataDelete, setDataDelete] = useState<any>({});
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
   const fetcher = useFetcher<any>();
+  const navigate = useNavigate();
   const handleEdit = (data: PinjamanType) => {
     editData(data);
     setIsModalEdit(true);
@@ -110,6 +140,19 @@ export default function PinjamanIdex() {
     });
   };
 
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const idMember = event.target.value;
+
+    if (idMember !== "default") {
+      console.log({ idMember });
+      navigate(`/pinjaman?member=${idMember}`);
+    }
+
+    if (idMember === "semua") {
+      navigate("/pinjaman");
+    }
+  };
+
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
@@ -147,6 +190,32 @@ export default function PinjamanIdex() {
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
           <SearchInput link="/pinjaman?q" placeholder="Cari buku terpinjam" />
         </div>
+        {(user.role == "super admin" || user.role == "admin") && (
+          <div className="w-[90%] lg:w-[30%] h-max mt-4 ">
+            <div className="relative">
+              <select
+                id="select"
+                className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-blue-500 sm:text-sm rounded-md ring-2 ring-indigo-500"
+                onChange={handleFilterChange}
+                defaultValue="default"
+              >
+                <option value="default" disabled>
+                  Filter berdasarkan member
+                </option>
+                <option value="semua">Semua</option>
+                {dataMember?.map((item) => (
+                  <option
+                    key={item.id}
+                    value={item.id}
+                    className="text-black capitalize"
+                  >
+                    {item.username} ({item.role})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
         <div className="min-h-max max-h-[450px] relative overflow-auto  mt-7 border border-gray-400 rounded-md">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-xs text-white uppercase bg-gray-700">
@@ -197,7 +266,7 @@ export default function PinjamanIdex() {
               </tr>
             </thead>
             <tbody>
-              {data?.length == 0 && (
+              {dataPinjaman?.length == 0 && (
                 <tr>
                   <td
                     colSpan={8}
@@ -207,7 +276,7 @@ export default function PinjamanIdex() {
                   </td>
                 </tr>
               )}
-              {data?.map((item, i) => (
+              {dataPinjaman?.map((item, i) => (
                 <tr className="bg-transparent border-b border-gray-400" key={i}>
                   <td className="w-4 p-4">
                     <div className="flex items-center">

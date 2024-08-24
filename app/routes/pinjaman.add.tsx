@@ -154,7 +154,7 @@ export default function TambahPinjaman() {
                 >
                   {dataBuku.map((item: any, i: number) => (
                     <option value={item.id} key={i}>
-                      {item.judul_buku}
+                      {item.judul_buku} ({item.stok - item.terpinjam})
                     </option>
                   ))}
                 </select>

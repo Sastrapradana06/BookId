@@ -71,6 +71,27 @@ export function formatDate(isoString: string): string {
   return date.toLocaleDateString("id-ID", options);
 }
 
+export function formatTimestamp(timestamp: string) {
+  const date = new Date(timestamp);
+
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  };
+
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  };
+
+  const formattedDate = date.toLocaleDateString("id-ID", dateOptions);
+  const time = date.toLocaleTimeString("id-ID", timeOptions);
+
+  return `${formattedDate.replace(",", "")} at ${time}`;
+}
+
 export function calculateRating(borrowed: number, stock: number) {
   const ratio = borrowed / stock;
   const rating = Math.min(5, Math.max(0, Math.round(ratio * 5)));
