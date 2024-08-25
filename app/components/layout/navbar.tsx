@@ -1,14 +1,22 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Mail, SquareMenu } from "lucide-react";
 import Sidebar from "./sidebar";
 import { useState } from "react";
-import { Link, useOutletContext } from "@remix-run/react";
+import { Link, useLocation, useOutletContext } from "@remix-run/react";
 import { UserContext } from "~/utils/type";
 import { getDay, getFormattedDate } from "~/utils/utils";
+import useAppStore from "~/store";
+import { useShallow } from "zustand/react/shallow";
 
 export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const { pathname } = useLocation();
+
   const { user } = useOutletContext<UserContext>();
+  const [notifCount] = useAppStore(
+    useShallow((state: any) => [state.notifCount])
+  );
 
   return (
     <>
@@ -35,9 +43,16 @@ export default function Navbar() {
             </p>
           </div>
           <div className="w-max h-max flex items-center gap-4 lg:gap-6">
-            <Link to="/notifikasi" className="cursor-pointer  p-1 relative">
+            <Link
+              to="/notifikasi"
+              className={`cursor-pointer  p-1 relative rounded-md ${
+                pathname == "/notifikasi" && "bg-purple-200 "
+              }`}
+            >
               <Mail size={25} color="gray" />
-              <div className="w-[10px] h-[10px] bg-red-500 rounded-full absolute top-0 right-0"></div>
+              {notifCount > 0 && (
+                <div className="w-[10px] h-[10px] bg-red-500 rounded-full absolute top-0 right-0"></div>
+              )}
             </Link>
             <img
               src={user.foto_profil}

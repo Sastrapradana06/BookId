@@ -4,6 +4,7 @@ import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import { ScanEye, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import Container from "~/components/layout/container";
 import ModalDelete from "~/components/layout/modal-delete";
 import NavLink from "~/components/layout/nav-link";
@@ -11,12 +12,14 @@ import SearchInput from "~/components/layout/search-input";
 import Alert from "~/components/ui/alert";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import { BookDB } from "~/utils/type";
+import useAppStore from "~/store";
+import { BookDB, NotifDB } from "~/utils/type";
 import { formatDate } from "~/utils/utils";
 
 type LoaderData = {
   status: boolean;
   data?: BookDB[];
+  dataNotif?: NotifDB[];
   error?: {
     code: string;
   };
@@ -59,8 +62,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
     return json({ status: true, data: filter });
   }
-
-  return json({ status: true, data: dataBuku.data });
+  const getDataNotif = await getDataDb("data notif");
+  return json({
+    status: true,
+    data: dataBuku.data,
+    dataNotif: getDataNotif.data,
+  });
 };
 
 export default function Books() {
@@ -71,7 +78,10 @@ export default function Books() {
   const [idAllDelete, setIdAllDelete] = useState<number[]>([]);
 
   const fetcher = useFetcher<any>();
-  const { data } = useLoaderData<LoaderData>();
+  const { data, dataNotif } = useLoaderData<LoaderData>();
+  const [setNotifCount] = useAppStore(
+    useShallow((state: any) => [state.setNotifCount])
+  );
 
   const deleteBuku = async () => {
     fetcher.submit(
@@ -95,6 +105,7 @@ export default function Books() {
   };
 
   useEffect(() => {
+    setNotifCount(dataNotif?.length || 0);
     if (fetcher.state === "idle" && fetcher.data) {
       if (fetcher.data.success) {
         handleAlert("success", "Berhasil menghapus buku");

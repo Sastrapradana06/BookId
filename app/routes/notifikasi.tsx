@@ -7,11 +7,14 @@ import {
   redirect,
 } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import CardNotif from "~/components/layout/card-notif";
 import Container from "~/components/layout/container";
 import { isAuthUser } from "~/services/auth.server";
 import { deleteDataById } from "~/services/supabase/delete.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
+import useAppStore from "~/store";
 import { MembersDB, NotifDB } from "~/utils/type";
 
 type LoaderDataType = {
@@ -47,6 +50,16 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Notifikasi() {
   const { dataNotif } = useLoaderData<LoaderDataType>();
+
+  const [setNotifCount] = useAppStore(
+    useShallow((state: any) => [state.setNotifCount])
+  );
+
+  useEffect(() => {
+    if (dataNotif?.length === 0) {
+      setNotifCount(0);
+    }
+  }, [dataNotif]);
 
   return (
     <Container>
