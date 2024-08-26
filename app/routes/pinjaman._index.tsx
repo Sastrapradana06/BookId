@@ -5,6 +5,7 @@ import {
   useLoaderData,
   useNavigate,
   useOutletContext,
+  useSearchParams,
 } from "@remix-run/react";
 import useHandleAlert from "hooks/useHandleAlert";
 import { Check, Pencil, Trash2 } from "lucide-react";
@@ -24,6 +25,7 @@ import { formatTanggal, getFirstLetters } from "~/utils/utils";
 
 type LoaderDataPinjaman = {
   status: boolean;
+  message: string;
   dataPinjaman?: PinjamanType[];
   dataMember?: MembersDB[];
 };
@@ -53,6 +55,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
   const url = new URL(request.url);
   const filterMember = url.searchParams.get("member");
+  const status = url.searchParams.get("status");
 
   const getData = await getDataDb("data pinjaman");
 
@@ -61,6 +64,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   let dataPinjamanBuku = getData.data;
+  let message = "";
+
+  if (user.role !== "super admin" && user.role !== "admin") {
+    const filterByUser = dataPinjamanBuku.filter((item: any) => {
+      return item.id_member == user.id;
+    });
+    dataPinjamanBuku = filterByUser;
+    message = "Data pinjaman buku yang anda pinjam";
+  }
 
   // filter ketersediaan buku
 
@@ -68,15 +80,16 @@ export const loader: LoaderFunction = async ({ request }) => {
     const filterByMember = dataPinjamanBuku.filter((item: any) => {
       return item.id_member == filterMember;
     });
+    if (filterByMember.length === 0) message = "Member belum membuat pinjaman";
     dataPinjamanBuku = filterByMember;
-  } else {
-    if (user.role !== "super admin" && user.role !== "admin") {
-      const filterByUser = dataPinjamanBuku.filter((item: any) => {
-        return item.id_member == user.id;
-      });
+  }
 
-      dataPinjamanBuku = filterByUser;
-    }
+  if (status) {
+    const filterByStatus = dataPinjamanBuku.filter((item: any) => {
+      return item.status == status;
+    });
+    if (filterByStatus.length === 0) message = `Buku yang ${status} belum ada`;
+    dataPinjamanBuku = filterByStatus;
   }
 
   const getDataMember = await getDataDb("data members");
@@ -86,13 +99,15 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   return json({
     success: true,
+    message,
     dataPinjaman: dataPinjamanBuku,
     dataMember: filterDataMember,
   });
 };
 
 export default function PinjamanIdex() {
-  const { dataPinjaman, dataMember } = useLoaderData<LoaderDataPinjaman>();
+  const { message, dataPinjaman, dataMember } =
+    useLoaderData<LoaderDataPinjaman>();
   const { user } = useOutletContext<UserContext>();
   const [isModalEdit, setIsModalEdit] = useState(false);
   const [dataEdit, editData] = useState<PinjamanType>();
@@ -101,6 +116,9 @@ export default function PinjamanIdex() {
   const { status, data: dataAlert, handleAlert } = useHandleAlert();
   const fetcher = useFetcher<any>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  console.log({ searchParams });
+
   const handleEdit = (data: PinjamanType) => {
     editData(data);
     setIsModalEdit(true);
@@ -140,17 +158,44 @@ export default function PinjamanIdex() {
     });
   };
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleFilterChangeMember = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     const idMember = event.target.value;
 
+    // Set query parameter for member
     if (idMember !== "default") {
-      console.log({ idMember });
-      navigate(`/pinjaman?member=${idMember}`);
+      searchParams.set("member", idMember);
+    } else {
+      searchParams.delete("member");
     }
 
+    // Handle special case for "semua"
     if (idMember === "semua") {
-      navigate("/pinjaman");
+      searchParams.delete("member");
     }
+
+    navigate(`/pinjaman?${searchParams.toString()}`);
+  };
+
+  const handleFilterChangeStatus = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const status = event.target.value;
+
+    // Set query parameter for status
+    if (status !== "default") {
+      searchParams.set("status", status);
+    } else {
+      searchParams.delete("status");
+    }
+
+    // Handle special case for "semua"
+    if (status === "semua") {
+      searchParams.delete("status");
+    }
+
+    navigate(`/pinjaman?${searchParams.toString()}`);
   };
 
   useEffect(() => {
@@ -190,32 +235,53 @@ export default function PinjamanIdex() {
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
           <SearchInput link="/pinjaman?q" placeholder="Cari buku terpinjam" />
         </div>
-        {(user.role == "super admin" || user.role == "admin") && (
-          <div className="w-[90%] lg:w-[30%] h-max mt-4 ">
+        <div className="w-full h-max  flex flex-col gap-4 lg:flex-row">
+          {(user.role == "super admin" || user.role == "admin") && (
+            <div className="w-[90%] lg:w-[30%] h-max mt-4 ">
+              <div className="relative">
+                <select
+                  id="select"
+                  className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-blue-500 sm:text-sm rounded-md ring-2 ring-indigo-500"
+                  onChange={handleFilterChangeMember}
+                  defaultValue="default"
+                >
+                  <option value="default" disabled>
+                    Filter berdasarkan member
+                  </option>
+                  <option value="semua">Semua</option>
+                  {dataMember?.map((item) => (
+                    <option
+                      key={item.id}
+                      value={item.id}
+                      className="text-black capitalize"
+                    >
+                      {item.username} ({item.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
+          <div className="w-[90%] lg:w-[25%] h-max mt-4 ">
             <div className="relative">
               <select
                 id="select"
                 className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-3 focus:ring-indigo-500 focus:border-blue-500 sm:text-sm rounded-md ring-2 ring-indigo-500"
-                onChange={handleFilterChange}
+                onChange={handleFilterChangeStatus}
                 defaultValue="default"
               >
                 <option value="default" disabled>
-                  Filter berdasarkan member
+                  Filter berdasarkan status
                 </option>
                 <option value="semua">Semua</option>
-                {dataMember?.map((item) => (
-                  <option
-                    key={item.id}
-                    value={item.id}
-                    className="text-black capitalize"
-                  >
-                    {item.username} ({item.role})
-                  </option>
-                ))}
+
+                <option value="terpinjam">Terpinjam</option>
+                <option value="dikembalikan">Dikembalikan</option>
+                <option value="terlambat">Terlambat</option>
               </select>
             </div>
           </div>
-        )}
+        </div>
         <div className="min-h-max max-h-[450px] relative overflow-auto  mt-7 border border-gray-400 rounded-md">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-xs text-white uppercase bg-gray-700">
@@ -272,7 +338,7 @@ export default function PinjamanIdex() {
                     colSpan={8}
                     className="text-center p-3 font-semibold text-red-400"
                   >
-                    Belum ada buku terpinjam
+                    {message}
                   </td>
                 </tr>
               )}
