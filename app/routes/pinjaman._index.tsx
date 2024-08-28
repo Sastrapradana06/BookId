@@ -20,8 +20,10 @@ import Loading from "~/components/ui/loading";
 
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
+import { insertDataDb } from "~/services/supabase/insert.server";
+import { updateDataDb } from "~/services/supabase/update.server";
 import { MembersDB, PinjamanType, UserContext } from "~/utils/type";
-import { formatTanggal, getFirstLetters } from "~/utils/utils";
+import { checkLate, formatTanggal, getFirstLetters } from "~/utils/utils";
 
 type LoaderDataPinjaman = {
   status: boolean;
@@ -66,6 +68,22 @@ export const loader: LoaderFunction = async ({ request }) => {
   let dataPinjamanBuku = getData.data;
   let message = "";
 
+  // filter pinjaman terlambat
+  dataPinjamanBuku.filter(async (item: any) => {
+    const a = checkLate(item.tgl_pengembalian);
+    if (a == "terlambat" && item.status == "terpinjam") {
+      await updateDataDb("data pinjaman", item.id, { status: "terlambat" });
+      await insertDataDb("data notif", {
+        status: "keterlambatan",
+        judul_buku: item.judul_buku,
+        nama_peminjam: item.nama_peminjam,
+      });
+      return item;
+    }
+  });
+
+  // filter by user
+
   if (user.role !== "super admin" && user.role !== "admin") {
     const filterByUser = dataPinjamanBuku.filter((item: any) => {
       return item.id_member == user.id;
@@ -94,7 +112,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const getDataMember = await getDataDb("data members");
   const filterDataMember = getDataMember.data.filter((item: any) => {
-    return item.role !== "super admin" && item.role !== "admin";
+    return item.role !== "super admin";
   });
 
   return json({

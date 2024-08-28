@@ -18,11 +18,15 @@ export const updateBook = async (id: number, data: any) => {
 
 export const updateDataDb = async (db: string, id: number, data: any) => {
   try {
-    const { error } = await supabase.from(db).update(data).eq("id", id);
+    const { data: newData, error } = await supabase
+      .from(db)
+      .update(data)
+      .eq("id", id)
+      .select();
     if (error) {
       throw error;
     }
-    return { status: true };
+    return { status: true, data: newData };
   } catch (error: any) {
     return { status: false, error: { code: error.code || "UNKNOWN_ERROR" } };
   }

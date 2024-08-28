@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { MetaFunction } from "@remix-run/node";
 import Logo from "~/components/ui/logo";
-
+import { json, LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import FormLogin from "~/components/template/form-login";
+import { getDataDb } from "~/services/supabase/fetch.server";
+import useAppStore from "~/store";
+import { useShallow } from "zustand/react/shallow";
+import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,7 +16,26 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export const loader: LoaderFunction = async () => {
+  const getData = await getDataDb("data perpustakaan");
+  if (getData.status === false) return json({ data: null });
+  const dataPerpus = getData.data[0];
+  return json({ data: dataPerpus });
+};
+
 export default function Index() {
+  const loader = useLoaderData<any>();
+  const [setDataPerpus] = useAppStore(
+    useShallow((state: any) => [state.setDataPerpus])
+  );
+
+  useEffect(() => {
+    if (loader.data) {
+      const { cover, nama } = loader.data;
+      setDataPerpus({ cover, nama });
+    }
+  }, [loader.data]);
+
   return (
     <main className="w-full h-[100vh]   flex flex-col items-center justify-center ">
       <div className="w-max h-[100px]  ">

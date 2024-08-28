@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   isRouteErrorResponse,
   Links,
@@ -12,10 +13,12 @@ import "./tailwind.css";
 import { json, LoaderFunction } from "@remix-run/node";
 import { getUser } from "./services/auth.server";
 import { MembersDB } from "./utils/type";
+import { getDataDb } from "./services/supabase/fetch.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUser(request);
-  return json({ user });
+  const getData = await getDataDb("data perpustakaan");
+  return json({ user, dataPerpus: getData.data[0] });
 };
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -37,8 +40,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { user } = useLoaderData<{ user: MembersDB }>();
-  return <Outlet context={{ user }} />;
+  const { user, dataPerpus } = useLoaderData<{
+    user: MembersDB;
+    dataPerpus: any;
+  }>();
+  return <Outlet context={{ user, dataPerpus }} />;
 }
 
 export function ErrorBoundary() {

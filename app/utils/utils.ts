@@ -1,5 +1,14 @@
 import crypto from "crypto";
 
+export function checkLate(tglDikembalikan: string) {
+  const tglSekarang = new Date();
+  const dateKembali = new Date(tglDikembalikan);
+
+  if (tglSekarang > dateKembali) {
+    return "terlambat";
+  }
+}
+
 export function getDay() {
   const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
   const sekarang = new Date();

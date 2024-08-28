@@ -13,6 +13,12 @@ export type UserContext = {
     status: string;
     password?: string;
   };
+  dataPerpus: {
+    id: number;
+    created_at: Date | string;
+    cover: string;
+    nama: string;
+  };
 };
 export type BookDB = {
   id: number;
