@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ActionFunction,
@@ -44,8 +45,18 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   const getDataNotif = await getDataDb("data notif");
+  if (getDataNotif.status === false) {
+    return json({ status: false, dataNotif: [] });
+  }
 
-  return json({ status: true, dataNotif: getDataNotif.data, user });
+  let dataNotif = getDataNotif.data;
+  if (user.role == "super admin" || user.role == "admin") {
+    return json({ status: true, dataNotif });
+  }
+
+  dataNotif = dataNotif.filter((item: any) => item.id_member == user.id);
+
+  return json({ status: true, dataNotif });
 };
 
 export default function Notifikasi() {

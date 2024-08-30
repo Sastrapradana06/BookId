@@ -42,8 +42,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const coverLama = fomData.get("coverLama") as string;
   const nama = fomData.get("nama") as string;
 
-  if (nama.length > 6) {
-    return json({ success: false, message: "Nama max 6 karakter" });
+  if (nama.length > 7) {
+    return json({ success: false, message: "Nama max 7 karakter" });
   }
 
   const dataUpdate = {

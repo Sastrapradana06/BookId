@@ -160,7 +160,8 @@ export default function FormEditProfile() {
                 name="jekel"
                 value={data.jekel}
                 onChange={onChange}
-                className="w-full h-[55px] rounded-lg  mt-2 px-3 text-[1rem] font-semibold bg-slate-300 border border-gray-300 outline-blue-500"
+                disabled={isEdit}
+                className="w-full h-[55px] rounded-lg  mt-2 px-3 text-[1rem] font-semibold bg-slate-300 border border-gray-300 outline-blue-500 disabled:bg-gray-200 disabled:outline-none"
               >
                 <option value="perempuan">Perempuan</option>
                 <option value="laki-laki">Laki-Laki</option>
@@ -190,7 +191,7 @@ export default function FormEditProfile() {
                 value={data.alamat}
                 onChange={onChange}
                 readOnly={isEdit}
-                className="w-full rounded-lg  mt-2  p-2 text-[1rem] font-semibold bg-slate-300 border border-gray-300 outline-blue-500"
+                className="w-full rounded-lg  mt-2  p-2 text-[1rem] font-semibold bg-slate-300 border border-gray-300 outline-blue-500 read-only:bg-gray-200 read-only:outline-none"
               ></textarea>
             </div>
           </div>

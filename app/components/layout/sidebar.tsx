@@ -50,7 +50,7 @@ export default function Sidebar({ isSidebarOpen }: { isSidebarOpen: boolean }) {
 
           <ListLink link="/profile" text="profile" icon={<UserCog />} />
           {user.role === "super admin" && (
-            <ListLink link="/setting" text="Setting" icon={<Settings />} />
+            <ListLink link="/setting" text="setting" icon={<Settings />} />
           )}
 
           <ListLink link="/api/auth/logout" text="Log out" icon={<LogOut />} />

@@ -54,6 +54,7 @@ export type NotifDB = {
   status: string;
   judul_buku: string;
   nama_peminjam: string | null;
+  id_member: number | null;
 };
 
 export type PinjamanType = {

@@ -50,6 +50,29 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+function filterByQuery(
+  pinjaman: PinjamanType[],
+  query: string
+): PinjamanType[] {
+  const filteredJudulBuku = pinjaman.filter((item) =>
+    item.judul_buku.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const filteredPeminjam = pinjaman.filter((item) => {
+    return item.nama_peminjam.toLowerCase().includes(query.toLowerCase());
+  });
+
+  const filteredNoKtp = pinjaman.filter((item) => {
+    return item.no_ktp.toLowerCase() == query;
+  });
+
+  const filteredResults = [
+    ...new Set([...filteredJudulBuku, ...filteredPeminjam, ...filteredNoKtp]),
+  ];
+
+  return filteredResults;
+}
+
 export const loader: LoaderFunction = async ({ request }) => {
   const user: any = await isAuthUser(request);
   if (!user) {
@@ -58,6 +81,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const filterMember = url.searchParams.get("member");
   const status = url.searchParams.get("status");
+  const q = url.searchParams.get("q");
 
   const getData = await getDataDb("data pinjaman");
 
@@ -77,6 +101,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         status: "keterlambatan",
         judul_buku: item.judul_buku,
         nama_peminjam: item.nama_peminjam,
+        id_member: item.id_member,
       });
       return item;
     }
@@ -92,7 +117,11 @@ export const loader: LoaderFunction = async ({ request }) => {
     message = "Data pinjaman buku yang anda pinjam";
   }
 
-  // filter ketersediaan buku
+  if (q) {
+    const filterByQ = filterByQuery(dataPinjamanBuku, q);
+    if (filterByQ.length === 0) message = "Data yang anda cari tidak ditemukan";
+    dataPinjamanBuku = filterByQ;
+  }
 
   if (filterMember) {
     const filterByMember = dataPinjamanBuku.filter((item: any) => {
@@ -253,7 +282,7 @@ export default function PinjamanIdex() {
         <div className="w-full h-max mt-4 flex gap-4  flex-wrap lg:justify-between lg:items-center">
           <SearchInput link="/pinjaman?q" placeholder="Cari buku terpinjam" />
         </div>
-        <div className="w-full h-max  flex flex-col gap-4 lg:flex-row">
+        <div className="w-full h-max  flex flex-col gap-1 lg:gap-4 lg:flex-row">
           {(user.role == "super admin" || user.role == "admin") && (
             <div className="w-[90%] lg:w-[30%] h-max mt-4 ">
               <div className="relative">
