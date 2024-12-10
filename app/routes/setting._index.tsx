@@ -21,10 +21,7 @@ import Label from "~/components/ui/label";
 import Loading from "~/components/ui/loading";
 import { isAuthUser } from "~/services/auth.server";
 import { getDataDb } from "~/services/supabase/fetch.server";
-import {
-  deleteImg,
-  uploadImgProfile,
-} from "~/services/supabase/storage.server";
+import { deleteImg, uploadImgLogo } from "~/services/supabase/storage.server";
 import { updateDataDb } from "~/services/supabase/update.server";
 import useAppStore from "~/store";
 import { extractFilePath } from "~/utils/utils";
@@ -54,7 +51,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (coverLama != "/gitbook.svg") {
     const urls = extractFilePath(coverLama);
 
-    const deleteFotoProfil = await deleteImg([urls]);
+    const deleteFotoProfil = await deleteImg(urls);
 
     if (!deleteFotoProfil) {
       return json({ success: false, error: "Gagal update foto profil" });
@@ -63,7 +60,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (cover && cover instanceof File) {
     if (cover.size != 0 && cover.name != "") {
-      const upload = await uploadImgProfile(cover);
+      const upload = await uploadImgLogo(cover);
 
       if (upload) {
         dataUpdate.cover = upload;

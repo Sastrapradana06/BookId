@@ -189,7 +189,7 @@ export default function Members() {
             </h1>
           </div>
         )}
-        <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-6 flex flex-wrap items-center justify-between lg:justify-center gap-4 lg:mt-8">
+        <div className="w-full min-h-max max-h-[500px] relative overflow-auto mt-6 flex flex-wrap items-center justify-center lg:justify-center gap-4 lg:mt-8">
           {data?.map((member: any) => (
             <CardMembers
               key={member.id}

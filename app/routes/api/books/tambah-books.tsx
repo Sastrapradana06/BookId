@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
 import { insertBook } from "~/services/supabase/insert.server";
-import { uploadImg } from "~/services/supabase/storage.server";
+import { uploadImgProfile } from "~/services/supabase/storage.server";
 
 type InsertDataBuku = {
   status: boolean;
@@ -27,7 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     if (fileCover && fileCover instanceof File) {
       if (fileCover.size != 0 && fileCover.name != "") {
-        const upload = await uploadImg(fileCover);
+        const upload = await uploadImgProfile(fileCover);
 
         if (upload) {
           dataForm.cover = upload;

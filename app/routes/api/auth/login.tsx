@@ -31,6 +31,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json({ success: false, message: user.message }, { status: 401 });
   }
 
+  if (user && user.status == "non-aktif") {
+    return json(
+      { success: false, message: "Akun anda sedang dinonaktifkan" },
+      { status: 401 }
+    );
+  }
+
   const session = await getSession(request.headers.get("Cookie"));
   session.set(authenticator.sessionKey, user);
 

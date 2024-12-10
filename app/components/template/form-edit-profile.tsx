@@ -64,7 +64,7 @@ export default function FormEditProfile() {
         handleAlert("success", "Profile berhasil diupdate");
         setTimeout(() => {
           navigate("/api/auth/logout");
-        }, 3000);
+        }, 1500);
       } else {
         handleAlert("error", fetcher.data.message);
       }

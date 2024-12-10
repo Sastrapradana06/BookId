@@ -23,7 +23,7 @@ export const action: ActionFunction = async ({ request }) => {
     if (imgLama != "/pp-cewek.jpeg" && imgLama != "/pp-cowok.jpeg") {
       const urls = extractFilePath(imgLama);
 
-      const deleteFotoProfil = await deleteImg([urls]);
+      const deleteFotoProfil = await deleteImg(urls);
 
       if (!deleteFotoProfil)
         return json({ success: false, error: "Gagal update foto profil" });

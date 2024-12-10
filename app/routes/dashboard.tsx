@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   const dataMember = await getDataDb("data members");
 
   const totalPinjaman = dataPinjamanBuku.data.filter((item: any) => {
-    return item.status == "terpinjam";
+    return item.status == "terpinjam" || item.status == "terlambat";
   });
 
   const popularBooks = dataBuku.data

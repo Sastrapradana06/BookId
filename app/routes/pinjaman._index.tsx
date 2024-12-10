@@ -114,7 +114,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       return item.id_member == user.id;
     });
     dataPinjamanBuku = filterByUser;
-    message = "Data pinjaman buku yang anda pinjam";
+    message = dataPinjamanBuku.length == 0 ? "Anda belum membuat pinjaman" : "";
   }
 
   if (q) {

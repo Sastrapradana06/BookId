@@ -1,6 +1,6 @@
 import { ActionFunction, json } from "@remix-run/node";
 import { insertMembers } from "~/services/supabase/insert.server";
-import { uploadImgProfile } from "~/services/supabase/storage.server";
+import { uploadImgLogo } from "~/services/supabase/storage.server";
 import { generatePassword } from "~/utils/utils";
 
 type InsertDataMembers = {
@@ -30,7 +30,7 @@ export const action: ActionFunction = async ({ request }) => {
 
     if (imgProfil && imgProfil instanceof File) {
       if (imgProfil.size != 0 && imgProfil.name != "") {
-        const upload = await uploadImgProfile(imgProfil);
+        const upload = await uploadImgLogo(imgProfil);
 
         if (upload) {
           dataForm.foto_profil = upload;

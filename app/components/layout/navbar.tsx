@@ -22,7 +22,7 @@ export default function Navbar() {
     <>
       <Sidebar isSidebarOpen={isSidebarOpen} />
       <nav className="w-full h-[70px] bg-slate-100 z-20 fixed top-0 lg:h-[80px]">
-        <div className="w-[90%] h-full m-auto flex justify-between items-center  lg:w-[95%]  lg:pl-[20%]">
+        <div className="w-[95%] h-full m-auto flex justify-between items-center  lg:w-[95%]  lg:pl-[20%] ">
           <button
             type="button"
             name="button"
@@ -31,7 +31,7 @@ export default function Navbar() {
           >
             <SquareMenu size={33} />
           </button>
-          <div className="w-max h-max  lg:flex flex-col -ml-10  lg:-ml-0">
+          <div className="w-max h-max  lg:flex flex-col -ml-7  lg:-ml-0">
             <h1 className="font-semibold text-[1rem] lg:text-[1.3rem] capitalize">
               {user.role}
             </h1>
